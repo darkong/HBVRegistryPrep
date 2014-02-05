@@ -1,17 +1,12 @@
 *========================================================================;
 * Analyst: 		Adam Coutts
 * Created: 		June 2, 2011
-Last updated:	May 3, 2012 by Alexia Exarchos
+Last updated:	May 17, 2012 by Alexia Exarchos
 * Purpose: 		Create link_id variable that matches matched pairs, and 
 				find best values of various variables (name, dob, ssn, 
 				diagnosis status, race, sex, etc) for each deduplicated 
 				person
 *========================================================================;
-
-* Back up previous mainfldr.setx14 dataset to archive folder prior to creating new file (at bottom of this program);
-data archive.setx14_&sysdate9;
-set mainfldr.setx14;
-run;
 
 * Do a few data cleaning steps while in posession of specific matches pairs;
 
@@ -331,10 +326,6 @@ data setx14 (drop = tempname);
 		end;
 run;
 
-data mainfldr.setx14;
-set setx14;
-run;
-
 * Save group IDs of trangendered folks - to set all values of that group to T later (some data systems
 	only allow M/F values - so, assume that if a person is identified as "T" in one system, T may be best
 	choice no matter what other values day);
@@ -484,7 +475,7 @@ data racetemp;
 	set racetemp1;
 	by link_id sort_race descending percent;
 	id_comp=lag1(link_id);
-	sort_comp=lag1(sort_race);;
+	sort_comp=lag1(sort_race);
 	
 	if percent > 50 then keeper=1;
 
@@ -502,6 +493,7 @@ data racetemp;
 	else if percent=50 then keeper=0;
 	else keeper=-1;
 run;
+
 
 data best_race (keep = link_id race_ethnicity) RaceProb (keep = link_id);
 	set racetemp;

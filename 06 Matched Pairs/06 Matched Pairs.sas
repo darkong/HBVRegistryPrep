@@ -486,8 +486,8 @@ run;
 proc sort data = look_carefully;
 by score;
 run;
-data look_carefully;
-set mainfldr.look_carefully;
+data mainfldr.look_carefully_ChronicHBV;
+set look_carefully;
 run;
 /* Code to allow for matches with score <30 to be counted as matches */
 
@@ -544,7 +544,7 @@ if 23.5<=score<30 then do;
 		if sameprison=1 then matchvars=catx(',',matchvars,'prison');
 	end;
 end;
-*if matchvars ne '';
+if matchvars ne '';
 run;
 
 proc sort data=callmatchtemp;
@@ -557,6 +557,8 @@ by matchvars prob;
 output out=statsmatch p1=p1;
 run;
 
+*get the mean and median for first percentile on score and use 
+that to select the scores to call a match when also have DOB;
 proc sort data = statsmatch; by p1; run;
 proc means data = statsmatch n mean median;
 var p1;
@@ -589,7 +591,7 @@ by id1 id2;
 if score >= 30 then match=1;
 if 23.5<=score<30 and samefname=1 and samelname=1 then do;
 	if index(matchvars,'ssn') then match=1;
-	if index(matchvars,'dob') and length(strip(fname1))>1 and p1>24.4 then match=1;
+	if index(matchvars,'dob') and length(strip(fname1))>1 and p1>24.6 then match=1;
 end;
 drop samefname samelname;
 run;
@@ -600,6 +602,6 @@ run;
 
 * Sort by last name, first name, dob - so as to be able to glance quickly at matched cases in the 
 		almost a match dataset;
-proc sort data=callmatch out=mainfldr.linked_pairs;
+proc sort data=callmatch out=mainfldr.linked_pairs_ChronicHBV;
 	by lname1 fname1 lname2 fname2 dob1 dob2;
 	run;

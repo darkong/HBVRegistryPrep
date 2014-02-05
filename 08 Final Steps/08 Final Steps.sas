@@ -11,18 +11,18 @@
 *=====================================================================;
 
 * Back up previous mainfldr.main01 and mainfldr.main02 datasets to archive folder prior to creating new files;
-data archive.main01_&sysdate9;
-set mainfldr.main01;
+data archive.main01_chronicHBV_&sysdate9;
+set mainfldr.main01_chronichbv;
 run;
 
-data archive.main02_&sysdate9;
-set mainfldr.main02;
+data archive.main02_chronichbv_&sysdate9;
+set mainfldr.main02_chronichbv;
 run;
 
 * Split data so as to create two final datasets - main01 (stem, unduplicated, person level, lower numbers) and 
 	main02 (leaf, multiple records per person, episode level, higher numbers);
 
-data main01 (keep = link_id first_name last_name middle_name ssn sex race_ethnicity date_of_birth 
+data main01 (keep = link_id first_name last_name middle_name ssn sex race_ethnicity date_of_birth country birthcountry patient_ID 
 		date_of_death prison_ever prison_firstrpt records_per firstdate dxdate main_diagnosis overall_diagnosis first_lhj common_lhj age agedx firstyear dxyear)
 	main02 (keep = link_id id occupation date_of_onset date_of_diagnosis mmwr_year patient_address 
 		patient_city patient_zip_code census_tract account_name account_address account_city account_zip_code
@@ -60,28 +60,6 @@ data main01;
 	if a then delete;
 	race_ethnicity=strip(race_ethnicity);
 	run;
-
-
-/*data dedup01;*/
-/*	set main01 (keep = link_id race_ethnicity sex prison_ever ssn date_of_birth first_name */
-/*		middle_name last_name common_lhj first_lhj rename = (link_id = id prison_ever = prison));*/
-/*	* to test code uncomment out the below code;*/
-/*	if substr(last_name,1,1) = "M";*/
-/*	run;*/
-/**/
-/*proc sql;*/
-/*	create table linked_pairs2 as*/
-/*	%sql_blocking(ssn,dedup01,2)*/
-/*	UNION*/
-/*	%sql_blocking(date_of_birth,dedup01,2)*/
-/*	UNION*/
-/*	%sql_blocking(first_name,dedup01,2)*/
-/*	UNION*/
-/*	%sql_blocking(last_name,dedup01,2)*/
-/*	;*/
-/*	quit;*/
-
-
 
 data template02;
 	attrib link_id length = 8. format = 8. informat = 8.;
@@ -122,7 +100,7 @@ data template02;
 	attrib patient_id length = $22. format = $22. informat = $22.;
 	run;
 
-data main02 mainfldr.main02;
+data main02 mainfldr.main02_chronichbv;
 	set template02 (in = a) main02;
 	if a then delete;
 	run;
@@ -142,12 +120,13 @@ data duplink1;
 
 proc sort data=duplink1 nodupkey; by link_id; run;
 
-data mainfldr.main01;
+data mainfldr.main01_ChronicHBV;
 set main01;
 run;
 
-* Run descriptive statistics;
 
+*************************************************************************************************************
+* Run descriptive statistics;
 * Group various asian/PIs and other/unknown for race_ethnicity variable before freqs;
 proc freq data=main01;
 	tables sex race_ethnicity prison_ever age firstyear dxyear first_lhj;
@@ -159,7 +138,7 @@ proc freq data=main01;
 	where overall_diagnosis in (1,2);
 	run;
 
-* Create year of birth varoable, and run stats on that (with the yobs grouped using yobchart format);
+* Create year of birth variable, and run stats on that (with the yobs grouped using yobchart format);
 data yob (drop = date_of_birth);
 	set main01 (keep = race_ethnicity date_of_birth);
 	attrib year_of_birth length = 8. format = 8. informat = 8.;
@@ -171,12 +150,4 @@ proc freq data=yob;
 	format race_ethnicity $raceamal. yob yobchart.;
 	run;
 
-* Look at episode-level dataset - number of prison-based episodes per LHJ;
-proc freq data = main02;
-	tables prison*local_health_juris;
-	run;
-proc tabulate data = main02;
-	class prison local_health_juris;
-	table prison, local_health_juris;
-	run;
 

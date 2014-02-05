@@ -67,6 +67,7 @@ if SSN = ' ' then SSN1 = XSSN;
 
 occupation2 = occupation;
 if occupation = ' ' then occupation2 = Xocc;
+if race = 'Black/Afrian-American' then race = 'Black/African-American';
 
 drop ssn xssn occupation xocc;
 run;
@@ -100,7 +101,7 @@ middle_name=MNA;
 		compatible with other datasets;
 sex = substr(sex,1,1);
 
-* Calculate race_ethnicity variable from seperate CalREADIE race and ethnicity variables;
+* Calculate race_ethnicity variable from seperate CalREDIE race and ethnicity variables;
 race_ethnicity = race;
 	if race = "American Indian/Alaska Native" then race_ethnicity = "Native American/Alaskan Native";
 	if race = "Asian - Other/Unknown" then race_ethnicity = "Asian";
@@ -150,6 +151,9 @@ if (notdigit(zip) > 5 | notdigit(strip(zip)) = 0) then
 		DtCreate = episode_date_2
 		DAT = episode_date_3
 		DtSubmit = episode_date_4;
+
+* Select CHRONIC HBV cases;
+if dis = 'HEP-B-CR';
 
 * Drop unnneeded variables;
 drop age aptno ctract cellphone CENSUSBLOCK CLUSTERID CMRNUMBER CntyOfResid COUNTRY 
