@@ -1,7 +1,7 @@
 *=====================================================================;
 * Analyst: 		Adam Coutts
 * Created: 		May 19, 2011
-Last Updated:	May 3, 2012 by Alexia Exarchos
+Last Updated:	July 25, 2013 by Darryl Kong
 * Purpose: 		Find matched pairs of cases - for deduplcating purposes
 *=====================================================================;
 
@@ -192,15 +192,15 @@ quit;
 %mend;
 
 * Create logarithmic weights for comparisons;
-%create_weights_fmt (data=mainfldr.main01, var=first_name, fmtname=fname_w,log=1);
-%create_weights_fmt (data=mainfldr.main01, var=first_name, fmtname=fname_a, log=1, asian_adjust=TRUE);
-%create_weights_fmt (data=mainfldr.main01, var=last_name, fmtname=lname_w,log=1);
+%create_weights_fmt (data=archive.main01, var=first_name, fmtname=fname_w,log=1);
+%create_weights_fmt (data=archive.main01, var=first_name, fmtname=fname_a, log=1, asian_adjust=TRUE);
+%create_weights_fmt (data=archive.main01, var=last_name, fmtname=lname_w,log=1);
 %create_weights_fmt (data=setx11, var=zip, fmtname=zip_w,log=1);
-%create_weights_fmt (data=mainfldr.main01, var=date_of_birth, fmtname=dob_w,log=1);
+%create_weights_fmt (data=archiver.main01, var=date_of_birth, fmtname=dob_w,log=1);
 %create_weights_fmt (data=setx11, var=local_health_juris, fmtname=lhj_w,log=1);
 * Create un-logarithmic weights for comparisons;
-%create_weights_fmt (data=mainfldr.main01, var=first_name, fmtname=fname_c,log=2);
-%create_weights_fmt (data=mainfldr.main01, var=last_name, fmtname=lname_c,log=2);
+%create_weights_fmt (data=archive.main01, var=first_name, fmtname=fname_c,log=2);
+%create_weights_fmt (data=archive.main01, var=last_name, fmtname=lname_c,log=2);
 
 
 /* 

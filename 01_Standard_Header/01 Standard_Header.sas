@@ -1,7 +1,7 @@
 *=====================================================================;
 * Analyst : 		Adam Coutts
 * Created : 		March 14, 2011
-* Last Updated : 	August 2, 2012 by Alexia Exarchos
+* Last Updated : 	July 25, 2013 by Darryl Kong
 * Purpose : 		Assign libnames and generate user-defined formats
 *=====================================================================;
 
@@ -45,7 +45,7 @@ data MorbFile;
 set "R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\hepb07022012.sas7bdat";
 run;
 data SFFTP;
-set "R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\cdph_sf_chronic_b_dl06072012.sas7bdat";
+set "R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Archived Data\cdph_sf_chronic_b_dl06072012.sas7bdat";
 run;
 
 proc format;
