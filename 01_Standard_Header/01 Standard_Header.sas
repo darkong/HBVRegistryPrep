@@ -1,7 +1,7 @@
 *=====================================================================;
 * Analyst : 		Adam Coutts
 * Created : 		March 14, 2011
-* Last Updated : 	April 26, 2012 by Alexia Exarchos
+* Last Updated : 	August 2, 2012 by Alexia Exarchos
 * Purpose : 		Assign libnames and generate user-defined formats
 *=====================================================================;
 
@@ -9,13 +9,13 @@
   Important because drive and folder permissions of user may vary.;
 
 * Main directory;
-%let directory=S:\State Surveillance\Chronic HBV Data Analysis\HBV Match 2012\;
+%let directory=R:\State Surveillance\HBV Data Analysis\HBV Match 2012\;
 
 * Main location containing SAS code;
-%let homeloc=\S:\State Surveillance\Chronic HBV Data Analysis\HBV Match 2012\SAS Code\;
+%let homeloc=\R:\State Surveillance\HBV Data Analysis\HBV Match 2012\SAS Code\;
 
 * Main location of datafiles used in analyses;
-%let acdir=S:\State Surveillance\Chronic HBV Data Analysis\HBV Match 2012\Datasets\;
+%let acdir=R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\;
 
 * Assign shorthand library name for various data locations;
 * Must run %let statement at beginning of 00 Runfile.sas program for the macro variable "directory" to work;
@@ -42,9 +42,11 @@ run;
 
 *Puts the merged Morbfile (CalREDIE/Morbfile/RAWvpd) as a temporary SAS file in work folder to view and check variables;
 data MorbFile;
-set "S:\State Surveillance\Chronic HBV Data Analysis\HBV Match 2012\Datasets\hepb05182012.sas7bdat";
+set "R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\hepb07022012.sas7bdat";
 run;
-
+data SFFTP;
+set "R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\cdph_sf_chronic_b_dl06072012.sas7bdat";
+run;
 
 proc format;
 * Expand one- or two-letter race ethnicity values out to longer text;

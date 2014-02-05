@@ -147,10 +147,9 @@ if (notdigit(zip) > 5 | notdigit(strip(zip)) = 0) then
 		DON = date_of_onset
 		DDX = date_of_diagnosis
 		DTH = date_of_death
-		DEP = episode_date_1
-		DtCreate = episode_date_2
-		DAT = episode_date_3
-		DtSubmit = episode_date_4;
+		DAT = episode_date_1
+		TD = episode_date_2
+		DUP = episode_date_3;
 
 * Select CHRONIC HBV cases;
 if dis = 'HEP-B-CR';
