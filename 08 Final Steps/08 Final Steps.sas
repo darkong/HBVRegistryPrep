@@ -22,13 +22,20 @@ run;
 * Split data so as to create two final datasets - main01 (stem, unduplicated, person level, lower numbers) and 
 	main02 (leaf, multiple records per person, episode level, higher numbers);
 
-data main01 (keep = link_id first_name last_name middle_name ssn sex race_ethnicity date_of_birth country birthcountry patient_ID 
+data main01 (keep = link_id first_name last_name middle_name ssn sex race_ethnicity date_of_birth country birthcountry patient_ID data_source
 		date_of_death prison_ever prison_firstrpt records_per firstdate dxdate main_diagnosis overall_diagnosis first_lhj common_lhj age agedx firstyear dxyear)
-	main02 (keep = link_id id occupation date_of_onset date_of_diagnosis mmwr_year patient_address 
+	 main02 (keep = link_id id occupation date_of_onset date_of_diagnosis mmwr_year patient_address 
 		patient_city patient_zip_code census_tract account_name account_address account_city account_zip_code
 		local_health_juris laboratory diagnosis ordering_doctor episode_date_1 episode_date_2 episode_date_3
 		episode_date_4 collection_date result_date firstdate reporter_type prison patient_id data_source result_comment 
 		result_name result_value test_name order_name diagnosis2);
+
+	*main01_ForFutureDedup (keep=link_id id first_name last_name middle_name ssn sex race_ethnicity date_of_birth prison_firstrpt first_lhj) 
+	*mainfldr.main02_ForMatching (keep=link_id id account_address account_city account_name account_zip_code census_tract collection_date  data_source 
+						date_of_birth date_of_death date_of_diagnosis date_of_onset diagnosis diagnosis2 episode_date_1 episode_date_2 episode_date_3
+						episode_date_4 first_name homeless laboratory last_name local_health_juris middle_name mmwr_year occupation order_name ordering_doctor
+						patient_address patient_city patient_id patient_zip_code prison race_ethnicity reporter_type result_comment result_date result_name
+						result_value sex ssn test_name units);
 	set setx15;
 	run;
 
@@ -123,31 +130,5 @@ proc sort data=duplink1 nodupkey; by link_id; run;
 data mainfldr.main01_ChronicHBV;
 set main01;
 run;
-
-
-*************************************************************************************************************
-* Run descriptive statistics;
-* Group various asian/PIs and other/unknown for race_ethnicity variable before freqs;
-proc freq data=main01;
-	tables sex race_ethnicity prison_ever age firstyear dxyear first_lhj;
-	format race_ethnicity $raceamal. age agechart.;
-	run;
-
-proc freq data=main01;
-	tables firstyear ;
-	where overall_diagnosis in (1,2);
-	run;
-
-* Create year of birth variable, and run stats on that (with the yobs grouped using yobchart format);
-data yob (drop = date_of_birth);
-	set main01 (keep = race_ethnicity date_of_birth);
-	attrib year_of_birth length = 8. format = 8. informat = 8.;
-	yob = year (date_of_birth);	
-	run;
-
-proc freq data=yob;
-	tables yob yob*race_ethnicity;
-	format race_ethnicity $raceamal. yob yobchart.;
-	run;
 
 

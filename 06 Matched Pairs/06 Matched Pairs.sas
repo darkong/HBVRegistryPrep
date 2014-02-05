@@ -12,7 +12,7 @@ data setx11 (index = (id first_name last_name zip date_of_birth ssn));
 	informat zip $5.;
 	* Just keep certain variables;
 	set set101 (keep = first_name last_name ssn date_of_birth sex patient_zip_code race_ethnicity
-		account_zip_code local_health_juris id prison middle_name);
+		account_zip_code local_health_juris id prison middle_name patient_id country countrybirth data_source);
 	* Create a single zip code for georgraphical location comparisons - take patient zip first, account zip
 			if patient is not available;
 	if patient_zip_code > 0 then zip = strip(put(patient_zip_code,8.));
@@ -557,6 +557,7 @@ by matchvars prob;
 output out=statsmatch p1=p1;
 run;
 
+
 *get the mean and median for first percentile on score and use 
 that to select the scores to call a match when also have DOB;
 proc sort data = statsmatch; by p1; run;
@@ -591,7 +592,7 @@ by id1 id2;
 if score >= 30 then match=1;
 if 23.5<=score<30 and samefname=1 and samelname=1 then do;
 	if index(matchvars,'ssn') then match=1;
-	if index(matchvars,'dob') and length(strip(fname1))>1 and p1>24.6 then match=1;
+	if index(matchvars,'dob') and length(strip(fname1))>1 and p1>24.7 then match=1;
 end;
 drop samefname samelname;
 run;
@@ -602,6 +603,6 @@ run;
 
 * Sort by last name, first name, dob - so as to be able to glance quickly at matched cases in the 
 		almost a match dataset;
-proc sort data=callmatch out=mainfldr.linked_pairs_ChronicHBV;
+proc sort data=callmatch out=mainfldr.linked_pairs_AcuteHBV;
 	by lname1 fname1 lname2 fname2 dob1 dob2;
 	run;

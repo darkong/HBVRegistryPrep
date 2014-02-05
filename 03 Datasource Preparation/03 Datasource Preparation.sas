@@ -1,7 +1,7 @@
 *=====================================================================;
 * Analyst: 		Adam Coutts
 * Created: 		March 27, 2011
-* Last updated:	April 26, 2012 by Alexia Exarchos
+* Last updated:	May 29, 2012 by Alexia Exarchos
 * Purpose: 		Prepare data from various datasets for merging - 
 					rename data, recode, etc. - then save to permanent 
 					datasets
@@ -63,13 +63,11 @@ data HBVprep;
 set morbfile;
 
 SSN1 = SSN;
-if SSN = ' ' then SSN1 = XSSN;
 
 occupation2 = occupation;
 if occupation = ' ' then occupation2 = Xocc;
-if race = 'Black/Afrian-American' then race = 'Black/African-American';
 
-drop ssn xssn occupation xocc;
+drop ssn occupation xocc;
 run;
 data HBVprep1;
 	set HBVprep;
@@ -102,16 +100,18 @@ middle_name=MNA;
 sex = substr(sex,1,1);
 
 * Calculate race_ethnicity variable from seperate CalREDIE race and ethnicity variables;
-race_ethnicity = race;
+* Calculate race_ethnicity variable from seperate CalREADIE race and ethnicity variables;
+	if index(race, "Black") then race_ethnicity = 'Black/African-American';
+	if race = 'White' then race_ethnicity = 'White';
 	if race = "American Indian/Alaska Native" then race_ethnicity = "Native American/Alaskan Native";
-	if race = "Asian - Other/Unknown" then race_ethnicity = "Asian";
-	if race = "Asian - Indian" then race_ethnicity = "Asian Indian";
-	if index(race,"Pacific Islander") then race_ethnicity = "Pacific Islander";
+	if index(race,"Asian - ") then race_ethnicity = "Asian/Pacific Islander";
+	if index(race,"Pacific Islander") then race_ethnicity = "Asian/Pacific Islander";
+	
 	if race = "Multiple Races" then race_ethnicity = "Multirace";
 	if ethnicity = "Hispanic/Latino" then race_ethnicity = "Hispanic/Latino";
+	else if race_ethnicity = ' ' then race_ethnicity = race;
 	if (ethnicity = "Unknown" & race_ethnicity ='') then race_ethnicity = "Unknown";
-	if index(race_ethnicity,"Asian - ") then race_ethnicity = compress(tranwrd (race_ethnicity,'Asian - ',''));
-	else race_ethnicity = tranwrd (race_ethnicity,'Asian - ','');
+
 
 * Standardize case;
 local_health_juris = upcase(LHD);
@@ -156,12 +156,58 @@ if (notdigit(zip) > 5 | notdigit(strip(zip)) = 0) then
 if dis = 'HEP-B-CR';
 
 * Drop unnneeded variables;
-drop age aptno ctract cellphone CENSUSBLOCK CLUSTERID CMRNUMBER CntyOfResid COUNTRY 
-	CountryBirth DISEASE DiseaseGrp DtAdmit DtArrival DtClosed DtDischarge 
+drop age aptno ctract cellphone CENSUSBLOCK CLUSTERID CMRNUMBER CntyOfResid 
+	DISEASE DiseaseGrp DtAdmit DtArrival DtClosed DtDischarge 
 	DtLabRpt DtSent EDD ethnicity FinalDispo HOMEPHONE 
 	HOSPITAL IndexCase INPATIENT LATITUDE LONGITUDE 
 	MRN namesuffix OccLocation OccSettingType OccSettingSpec
 	OutbreakNum OUTBREAKTYPE pregnant PStatus PtDiedIllness PtHospitalized race  
 	RPTBy RSNAME ssn1 STATE Submitter TStatus Zip id;
+
+run;
+
+
+* Process SF city/county data;
+
+data set004;
+	set sfftp;
+
+* Create size and type of new variables that will be calculated;
+	informat data_source $22. race_ethnicity $35. local_health_juris $20. patient_city $25.
+		account_name $40. account_address $80. account_city $22. account_zip_code 8.  occupation $25.;
+	* reason_testing $110. risk_factors $250.;
+
+* Identify data source;
+	data_source = "SF eFTP";
+
+* Recode multiple race and ethnicity variables down into one variable;
+	if race_amind = '1' then race_ethnicity = 'Native American/Alaskan Native';  
+	if race_asian = '1' then race_ethnicity = 'Asian/Pacific Islander';
+	if race_pacisland = '1' then race_ethnicity = 'Asian/Pacific Islander';
+	if race_black = '1' then race_ethnicity = 'Black/African-American';  
+	if race_white = '1' then race_ethnicity = 'White';  
+	if race_other = '1' then race_ethnicity = 'Other';  
+	if ethnic_grp = '1' then race_ethnicity = 'Hispanic/Latino';
+	if race_ethnicity = '' then race_ethnicity = 'Unknown';
+
+
+	local_health_juris = "SAN FRANCISCO";
+	if cnty_res = "San Francisco" then patient_city = "SAN FRANCISCO";
+	
+* Rename variables to standardize them with other datasets;
+	rename
+		birth_dt = date_of_birth
+		local_id = patient_id 
+		rep_dt = episode_date_1
+		birth_dt = date_of_birth
+		fname = first_name
+		lname = last_name
+		;
+
+* Drop unneeded variables;
+	drop race_amind race_asian race_black race_white race_other ethnic_grp race_pacisland 
+		NETSS_ID NETSS_YR event birth_country reastest_acutehep specoth_birthcountry reastest_acutehep 
+		reastest_livenzymes reastest_riskfact reastest_donor reastest_norisk reastest_followup reastest_prenatal 
+		reastest_other reastest_unknown specoth_reastest specoth_race cnty_res; 
 
 run;
