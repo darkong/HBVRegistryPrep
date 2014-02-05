@@ -68,6 +68,9 @@ occupation2 = occupation;
 if occupation = ' ' then occupation2 = Xocc;
 
 drop ssn occupation xocc;
+
+if LHD = 'SAN DIEGO' and RE = 'AA' then race = ' ';
+if LHD = 'SAN DIEGO' and RE = 'AA' then ethnicity = ' ';
 run;
 data HBVprep1;
 	set HBVprep;
