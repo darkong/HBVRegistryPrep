@@ -21,9 +21,10 @@ run;
 
 * Split data so as to create two final datasets - main01 (stem, unduplicated, person level, lower numbers) and 
 	main02 (leaf, multiple records per person, episode level, higher numbers);
+**DK CHANGE (ADD BEST AND CITY VARIABLES);
 
-data main01 (keep = link_id first_name last_name middle_name ssn sex race_ethnicity date_of_birth country birthcountry patient_ID data_source
-		date_of_death prison_ever prison_firstrpt records_per firstdate dxdate main_diagnosis overall_diagnosis first_lhj common_lhj age agedx firstyear dxyear)
+data main01 (keep = link_id best_first_name best_last_name best_middle_name best_ssn best_sex best_race_ethnicity best_date_of_birth country birthcountry patient_ID data_source
+		best_date_of_death prison_ever prison_firstrpt records_per firstdate dxdate main_diagnosis overall_diagnosis first_lhj common_lhj first_city common_city age agedx firstyear dxyear)
 	 main02 (keep = link_id id occupation date_of_onset date_of_diagnosis mmwr_year patient_address 
 		patient_city patient_zip_code census_tract account_name account_address account_city account_zip_code
 		local_health_juris laboratory diagnosis ordering_doctor episode_date_1 episode_date_2 episode_date_3
@@ -41,17 +42,17 @@ data main01 (keep = link_id first_name last_name middle_name ssn sex race_ethnic
 
 
 * Templates - so as to properly order variables in dataset;
-
+**DK CHANGE (ADD BEST AND CITY VARIABLES);
 data template01;
 	attrib link_id length = 8. format = 8. informat = 8.;
-	attrib first_name length = $20. format = $20. informat = $20.;
-	attrib last_name length = $35. format = $35. informat = $35.;
-	attrib middle_name length = $20. format = $20. informat = $20.;
-	attrib ssn length = 8. format = 9. informat = 9.;
-	attrib sex length = $1. format = $1. informat = $1.;
-	attrib race_ethnicity length = $35. format = $35. informat = $35.;
-	attrib date_of_birth length = 8. format = MMDDYY10. informat = MMDDYY10.;
-	attrib date_of_death length = 8. format = MMDDYY10. informat = MMDDYY10.;
+	attrib best_first_name length = $20. format = $20. informat = $20.;
+	attrib best_last_name length = $35. format = $35. informat = $35.;
+	attrib best_middle_name length = $20. format = $20. informat = $20.;
+	attrib best_ssn length = 8. format = 9. informat = 9.;
+	attrib best_sex length = $1. format = $1. informat = $1.;
+	attrib best_race_ethnicity length = $35. format = $35. informat = $35.;
+	attrib best_date_of_birth length = 8. format = MMDDYY10. informat = MMDDYY10.;
+	attrib best_date_of_death length = 8. format = MMDDYY10. informat = MMDDYY10.;
 	attrib firstdate length = 8. format = MMDDYY10. informat = MMDDYY10.;
 	attrib dxdate length = 8. format = MMDDYY10. informat = MMDDYY10.;
 	attrib prison_ever length = $1. format = $1. informat = $1.;
@@ -59,6 +60,9 @@ data template01;
 	attrib main_diagnosis length = 8. format = 1. informat = 1.;
 	attrib overall_diagnosis length = 8. format = 1. informat = 1.;
 	attrib first_lhj length = $20. format = $20. informat = $20.;
+	attrib common_lhj length = $20. format = $20. informat = $20.;
+	attrib first_city length = $25. format = $25. informat = $25.;
+	attrib common_city length = $25. format = $25. informat = $25.;
 	attrib records_per length = 8. format = 4. informat = 4.;
 	run;
 
@@ -117,7 +121,7 @@ data main02 mainfldr.main02_chronichbv;
 		(last name, dob, ssn, sex), so eliminate cases who have the same values - should work the
 		same as just taking one record per link_id;
 proc sort data=main01 nodupkey; 
-	by link_id last_name first_name date_of_birth ssn sex; 
+	by link_id best_last_name best_first_name best_date_of_birth best_ssn best_sex; 
 	run;
 
 * Look for cases where deduplicating may not have worked - ie where there are more than one link_id;
