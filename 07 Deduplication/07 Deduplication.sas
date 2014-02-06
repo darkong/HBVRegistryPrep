@@ -170,10 +170,10 @@ data setx14;
 	attrib dxdate	 length = 8. format = MMDDYY10. informat = MMDDYY10.;
 
 	* set date values to missing if they are before the date_of_birth;
-	if episode_date_1<date_of_birth then episode_date_1=.;
-	if episode_date_2<date_of_birth then episode_date_2=.;
-	if episode_date_3<date_of_birth then episode_date_3=.;
-	if episode_date_4<date_of_birth then episode_date_4=.;
+	if episode_date_1<date_of_birth or year(episode_date_1) < 1984 then episode_date_1=.;
+	if episode_date_2<date_of_birth or year(episode_date_2) < 1984 then episode_date_2=.;
+	if episode_date_3<date_of_birth or year(episode_date_3) < 1984 then episode_date_3=.;
+	if episode_date_4<date_of_birth or year(episode_date_4) < 1984 then episode_date_4=.;
 	if collection_date<date_of_birth then collection_date=.;
 	if result_date<date_of_birth then result_date=.;
 	if date_of_diagnosis<date_of_birth then date_of_diagnosis=.;

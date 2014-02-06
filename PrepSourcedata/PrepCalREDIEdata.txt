@@ -1,0 +1,571 @@
+
+libname calredie "R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\CalREDIE Cumulative\2012";
+
+
+/** Get CalREDIE data **/
+PROC IMPORT OUT= WORK.HEPBCsys 
+            DATAFILE= "R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\CalREDIE Cumulative\2012\sysextract.xlsx" 
+            DBMS=EXCEL REPLACE;
+     RANGE="Sysextract$"; 
+     GETNAMES=YES;
+     MIXED=NO;
+     USEDATE=YES;
+     SCANTIME=NO;
+	 SCANTEXT=YES;
+	 USEDATE = YES;
+RUN;
+
+data hepbcsys;
+set hepbcsys;
+report = 'CalREDIE';
+if (disshort in ('HEP-B', 'HEP-C') and rstatus = 'Confirmed' and pstatus = 'Closed by State') or
+   (disshort in ('HEP-B-CR', 'HEP-C-CR') and rstatus in ('Confirmed', 'Probable', 'Suspect'));
+drop f118-f143;
+run;
+
+data achbvcalredie;
+set hepbcsys;
+if disshort in ('HEP-B');
+run;
+
+data chhbvcalredie;
+set hepbcsys;
+if disshort in ('HEP-B-CR');
+run;
+
+data achcvcalredie;
+set hepbcsys;
+if disshort in ('HEP-C');
+run;
+
+data chhcvcalredie;
+set hepbcsys;
+if disshort in ('HEP-C-CR');
+run;
+
+PROC IMPORT OUT= WORK.acHBVCLI_death 
+            DATATABLE= "COMPOTHSX" 
+            DBMS=ACCESS REPLACE;
+     DATABASE="R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\CalREDIE Cumulative\2012\acHBVCLI.mdb"; 
+     SCANMEMO=YES;
+     USEDATE=NO;
+     SCANTIME=NO;
+	 USEDATE = YES;
+RUN;
+
+
+PROC IMPORT OUT= WORK.acHBVCLI_testrs 
+            DATATABLE= "HEPBCLICRRSNTST" 
+            DBMS=ACCESS REPLACE;
+     DATABASE="R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\CalREDIE Cumulative\2012\acHBVCLI.mdb"; 
+     SCANMEMO=YES;
+     SCANTIME=NO;
+	 USEDATE = YES;
+RUN;
+
+
+PROC IMPORT OUT= WORK.acHBVCLI_sxs 
+            DATATABLE= "hepbclicrsignsx" 
+            DBMS=ACCESS REPLACE;
+     DATABASE="R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\CalREDIE Cumulative\2012\acHBVCLI.mdb"; 
+     SCANMEMO=YES;
+     SCANTIME=NO;
+	 USEDATE = YES;
+RUN;
+
+PROC IMPORT OUT= WORK.acHBVCLI_vxhx 
+            DATATABLE= "hepbclicrvachx" 
+            DBMS=ACCESS REPLACE;
+     DATABASE="R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\CalREDIE Cumulative\2012\acHBVCLI.mdb"; 
+     SCANMEMO=YES;
+     SCANTIME=NO;
+	 USEDATE = YES;
+RUN;
+
+PROC IMPORT OUT= WORK.acHBVCLI_hosp 
+            DATATABLE= "hosp" 
+            DBMS=ACCESS REPLACE;
+     DATABASE="R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\CalREDIE Cumulative\2012\acHBVCLI.mdb"; 
+     SCANMEMO=YES;
+     SCANTIME=NO;
+	 USEDATE = YES;
+RUN;
+
+PROC IMPORT OUT= WORK.acHBVCLI_hospdtl 
+            DATATABLE= "hospdtl" 
+            DBMS=ACCESS REPLACE;
+     DATABASE="R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\CalREDIE Cumulative\2012\acHBVCLI.mdb"; 
+     SCANMEMO=YES;
+     SCANTIME=NO;
+	 USEDATE = YES;
+RUN;
+
+PROC IMPORT OUT= WORK.acHBVLAB_lftdx 
+            DATATABLE= "dxlvrenzlev" 
+            DBMS=ACCESS REPLACE;
+     DATABASE="R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\CalREDIE Cumulative\2012\acHBVLAB.mdb"; 
+     SCANMEMO=YES;
+     SCANTIME=NO;
+	 USEDATE = YES;
+RUN;
+
+PROC IMPORT OUT= WORK.acHBVLAB_tst
+            DATATABLE= "HEPBLABCRDXTST" 
+            DBMS=ACCESS REPLACE;
+     DATABASE="R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\CalREDIE Cumulative\2012\acHBVLAB.mdb"; 
+     SCANMEMO=YES;
+     SCANTIME=NO;
+	 USEDATE = YES;
+RUN;
+
+
+PROC IMPORT OUT= WORK.acHBVLAB_tstoth
+            DATATABLE= "HEPBLABCRDXTSTOTH" 
+            DBMS=ACCESS REPLACE;
+     DATABASE="R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\CalREDIE Cumulative\2012\acHBVLAB.mdb"; 
+     SCANMEMO=YES;
+     SCANTIME=NO;
+	 USEDATE = YES;
+RUN;
+
+
+PROC IMPORT OUT= WORK.acHCVCLI_death 
+            DATATABLE= "COMPOTHSX" 
+            DBMS=ACCESS REPLACE;
+     DATABASE="R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\CalREDIE Cumulative\2012\acHCVCLI.mdb"; 
+     SCANMEMO=YES;
+     USEDATE=NO;
+     SCANTIME=NO;
+	 USEDATE = YES;
+RUN;
+
+
+PROC IMPORT OUT= WORK.acHCVCLI_testrs 
+            DATATABLE= "HEPCCLICRRSNTST" 
+            DBMS=ACCESS REPLACE;
+     DATABASE="R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\CalREDIE Cumulative\2012\acHCVCLI.mdb"; 
+     SCANMEMO=YES;
+     SCANTIME=NO;
+	 USEDATE = YES;
+RUN;
+
+
+PROC IMPORT OUT= WORK.acHCVCLI_sxs 
+            DATATABLE= "hepcclicrsignsx" 
+            DBMS=ACCESS REPLACE;
+     DATABASE="R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\CalREDIE Cumulative\2012\acHCVCLI.mdb"; 
+     SCANMEMO=YES;
+     SCANTIME=NO;
+	 USEDATE = YES;
+RUN;
+
+PROC IMPORT OUT= WORK.acHCVCLI_vxhx 
+            DATATABLE= "hepcclicrvachx" 
+            DBMS=ACCESS REPLACE;
+     DATABASE="R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\CalREDIE Cumulative\2012\acHCVCLI.mdb"; 
+     SCANMEMO=YES;
+     SCANTIME=NO;
+	 USEDATE = YES;
+RUN;
+
+PROC IMPORT OUT= WORK.acHCVCLI_hosp 
+            DATATABLE= "hosp" 
+            DBMS=ACCESS REPLACE;
+     DATABASE="R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\CalREDIE Cumulative\2012\acHCVCLI.mdb"; 
+     SCANMEMO=YES;
+     SCANTIME=NO;
+	 USEDATE = YES;
+RUN;
+
+PROC IMPORT OUT= WORK.acHCVCLI_hospdtl 
+            DATATABLE= "hospdtl" 
+            DBMS=ACCESS REPLACE;
+     DATABASE="R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\CalREDIE Cumulative\2012\acHCVCLI.mdb"; 
+     SCANMEMO=YES;
+     SCANTIME=NO;
+	 USEDATE = YES;
+RUN;
+
+PROC IMPORT OUT= WORK.acHCVLAB_lftdx 
+            DATATABLE= "dxlvrenzlev" 
+            DBMS=ACCESS REPLACE;
+     DATABASE="R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\CalREDIE Cumulative\2012\acHCVLAB.mdb"; 
+     SCANMEMO=YES;
+     SCANTIME=NO;
+	 USEDATE = YES;
+RUN;
+
+PROC IMPORT OUT= WORK.acHCVLAB_tst
+            DATATABLE= "HEPCLABCRDXTST" 
+            DBMS=ACCESS REPLACE;
+     DATABASE="R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\CalREDIE Cumulative\2012\acHCVLAB.mdb"; 
+     SCANMEMO=YES;
+     SCANTIME=NO;
+	 USEDATE = YES;
+RUN;
+
+PROC IMPORT OUT= WORK.acHCVLAB_tstoth
+            DATATABLE= "HEPCLABCRDXTSTOTH" 
+            DBMS=ACCESS REPLACE;
+     DATABASE="R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\CalREDIE Cumulative\2012\acHCVLAB.mdb"; 
+     SCANMEMO=YES;
+     SCANTIME=NO;
+	 USEDATE = YES;
+RUN;
+
+proc sql;
+	create table achbvcalredie as
+	select a.IncidentID,
+		   a.CMRNumber,
+		   a.DisShort,
+		   a.PersonId,
+		   a.LastName,
+		   a.FirstName,
+		   a.MiddleName,
+		   a.SSN,
+		   a.DOB,
+		   a.Age,
+		   a.Ethnicity,
+		   a.Race,
+		   a.RaceAIAN,
+		   a.RaceASIAN,
+		   a.RaceBLACK,
+		   a.RaceNHPI,
+		   a.RaceOTHER,
+		   a.RaceWHITE,
+		   a.RaceUNK,
+		   a.Address,
+		   a.AptNo,
+		   a.City,
+		   a.State,
+		   a.Zip,
+		   a.Ctract,
+		   a.CensusBlock,
+		   a.Latitude,
+		   a.Longitude,
+		   a.CntyofResid,
+		   a.Country,
+		   a.CountryBirth,
+		   a.DtArrival,
+		   a.HomePhone,
+		   a.CellPhone,
+		   a.WorkPhone,
+		   a.Email,
+		   a.Sex,
+		   a.Pregnant,
+		   a.EDD,
+		   a.OccSettingType,
+		   a.OccSettingSpec,
+		   a.Occupation,
+		   a.OccSpecify,
+		   a.OccLocation,
+		   a.LHJ,
+		   a.LHJNumber,
+		   a.SecondLHJ,
+		   a.RSName,
+		   a.RSLocation,
+		   a.RSAddress,
+		   a.RSCity,
+		   a.RSState,
+		   a.RSZipCode,
+		   a.RSPhone,
+		   a.Laboratory,
+		   a.LabCity,
+		   a.LabState,
+		   a.ClusterID,
+		   a.PtHospitalized,
+		   a.Inpatient,
+		   a.Hospital,
+		   a.DtOnset,
+		   a.DtLabCollect,
+		   a.DtLabResult,
+		   a.DtDiagnosis,
+		   a.DtDeath,
+		   a.DtReceived,
+		   a.DtCreate,
+		   a.DtEpisode,
+		   a.DtClosed,
+		   a.DtAdmit,
+		   a.Dtdischarge,
+		   a.Istatus,
+		   a.Pstatus,
+		   a.Rstatus,
+		   a.DtLastEdit,
+		   a.report,
+		   b.HEPBCLICRRSNTSTRSN as tstreas,
+		   b.HEPBCLICRRSNTSTRSNSPFY as tstreasspfy,
+		   c.HEPBCLICRSIGNSXSYMPTOMATIC as symptomatic,
+		   c.HEPBCLICRSIGNSXSX as sxs,
+		   c.HEPBCLICRSIGNSXSXSPFY as sxsspfy,
+		   d.COMPOTHSXDIED as died,
+		   e.HOSPER as er,
+		   e.HOSPHOSPITALIZED as hosp,
+		   e.HOSPDAYSHOSP as hospnites,
+		   f.HEPBCLICRVACHXIMMHEPB as hbvax,
+		   f.HEPBCLICRVACHXVACTYPEHEPB as hbvaxtype,
+		   f.HEPBCLICRVACHXVAC1HEPB as hbvax1,
+		   f.HEPBCLICRVACHXVAC1DTHEPB as hbvax1dt,
+		   f.HEPBCLICRVACHXVAC2HEPB as hbvax2,
+		   f.HEPBCLICRVACHXVAC2DTHEPB as hbvax2dt,
+		   f.HEPBCLICRVACHXVAC3HEPB as hbvax3,
+		   f.HEPBCLICRVACHXVAC3DTHEPB as hbvax3dt,
+  		   f.HEPBCLICRVACHXRSNNOTVAC as notvaxreas,
+		   f.HEPBCLICRVACHXANTIHBTST as pvst,
+		   f.HEPBCLICRVACHXANTIHBTSTSERUM as pvstr,
+		   f.HEPBCLICRVACHXIMMHEPA as havax,
+		   f.HEPBCLICRVACHXVACTYPEHEPA as havaxtype,
+		   f.HEPBCLICRVACHXVAC1HEPA as havax1,
+		   f.HEPBCLICRVACHXVAC1DTHEPA as havax1dt,
+		   f.HEPBCLICRVACHXVAC2HEPA as havax2,
+		   f.HEPBCLICRVACHXVAC2DTHEPA as havax2dt,
+		   f.HEPBCLICRVACHXCOMMENTS as vaxcomment,
+		   g.DXLVRENZLEVALTSGPTRSLT as rawalt,
+		   g.DXLVRENZLEVALTSGPTDT as altdt,
+		   g.DXLVRENZLEVALTSGOTRSLT as rawast,
+		   g.DXLVRENZLEVALTSGOTDT as astdt, 
+		   g.DXLVRENZLEVBILIRUBINRSLT as rawbili,
+		   g.DXLVRENZLEVBILIRUBINDT as bilidt,
+		   h.HEPBLABCRDXTSTHBSAGRSLT as hbsagr,
+		   h.HEPBLABCRDXTSTHBSAGDT as hbsagdt,
+		   h.HEPBLABCRDXTSTANTIHBCIGMRSLT as igmhbcr,
+		   h.HEPBLABCRDXTSTANTIHBCIGMDT as igmhbcdt,
+		   h.HEPBLABCRDXTSTANTIHBSRSLT as antihbsr,
+		   h.HEPBLABCRDXTSTANTIHBSDT as antihbsdt,
+		   h.HEPBLABCRDXTSTANTIHBCRSLT as antihbcr,
+		   h.HEPBLABCRDXTSTANTIHBCDT as antihbcdt,
+		   h.HEPBLABCRDXTSTHBeAgRslt as hbeagr,
+		   h.HEPBLABCRDXTSTHBeAgDt as hbeagdt,
+		   h.HEPBLABCRDXTSTHBVDNAQUALRSLT as hbvqualr,
+		   h.HEPBLABCRDXTSTDNAQUALDT as hbvqualdt,
+		   h.HEPBLABCRDXTSTHBVDNARslt as hbviur,
+		   h.HEPBLABCRDXTSTHBVDNADt as hbviudt,  
+		   i.HEPBLABCRDXTSTOTHANTIHAVIGMRSLT as igmhavr,
+		   i.HEPBLABCRDXTSTOTHANTIHAVIGMDT as igmhavdt,
+		   i.HEPBLABCRDXTSTOTHANTIHAVRSLT as antihavr,
+		   i.HEPBLABCRDXTSTOTHANTIHAVDT as antihavdt,
+		   i.HEPBLABCRDXTSTOTHANTIHCVRSLT as antihcvr,
+		   i.HEPBLABCRDXTSTOTHANTIHCVCUTRATIO as antihcvrat,
+		   i.HEPBLABCRDXTSTOTHANTIHCVTRUPOS as antihcvtrupos,
+		   i.HEPBLABCRDXTSTOTHANTIHCVDT as antihcvdt,
+		   i.HEPBLABCRDXTSTOTHHCVRIBARSLT as hcvribar,
+		   i.HEPBLABCRDXTSTOTHHCVRIBADT as hcvribadt,
+		   i.HEPBLABCRDXTSTOTHHCVRNARSLT as hcvqualr,
+		   i.HEPBLABCRDXTSTOTHHCVRNADT as hcvqualdt,
+		   i.HEPBLABCRDXTSTOTHANTIHDVRSLT as antihdvr,
+		   i.HEPBLABCRDXTSTOTHANTIHDVDT as antihdvdt,
+		   i.HEPBLABCRDXTSTOTHANTIHEVRSLT as antihevr,
+		   i.HEPBLABCRDXTSTOTHANTIHEVDT as antihevdt
+from achbvcalredie as a left join achbvcli_testrs as b
+on a.incidentid = input(b.incidentid, 8.)
+left join achbvcli_sxs as c
+on a.incidentid = input(c.incidentid, 8.)
+left join achbvcli_death as d
+on a.incidentid = input(d.incidentid, 8.)
+left join achbvcli_hosp as e
+on a.incidentid = input(e.incidentid, 8.)
+left join achbvcli_vxhx as f
+on a.incidentid = input(f.incidentid, 8.)
+left join achbvlab_lftdx as g
+on a.incidentid = input(g.incidentid, 8.)
+left join achbvlab_tst as h
+on a.incidentid = input(h.incidentid, 8.)
+left join achbvlab_tstoth as i
+on a.incidentid = input(i.incidentid, 8.);
+quit;
+run;
+
+proc sql;
+	create table achcvcalredie as
+	select a.IncidentID,
+		   a.CMRNumber,
+		   a.DisShort,
+		   a.PersonId,
+		   a.LastName,
+		   a.FirstName,
+		   a.MiddleName,
+		   a.SSN,
+		   a.DOB,
+		   a.Age,
+		   a.Ethnicity,
+		   a.Race,
+		   a.RaceAIAN,
+		   a.RaceASIAN,
+		   a.RaceBLACK,
+		   a.RaceNHPI,
+		   a.RaceOTHER,
+		   a.RaceWHITE,
+		   a.RaceUNK,
+		   a.Address,
+		   a.AptNo,
+		   a.City,
+		   a.State,
+		   a.Zip,
+		   a.Ctract,
+		   a.CensusBlock,
+		   a.Latitude,
+		   a.Longitude,
+		   a.CntyofResid,
+		   a.Country,
+		   a.CountryBirth,
+		   a.DtArrival,
+		   a.HomePhone,
+		   a.CellPhone,
+		   a.WorkPhone,
+		   a.Email,
+		   a.Sex,
+		   a.Pregnant,
+		   a.EDD,
+		   a.OccSettingType,
+		   a.OccSettingSpec,
+		   a.Occupation,
+		   a.OccSpecify,
+		   a.OccLocation,
+		   a.LHJ,
+		   a.LHJNumber,
+		   a.SecondLHJ,
+		   a.RSName,
+		   a.RSLocation,
+		   a.RSAddress,
+		   a.RSCity,
+		   a.RSState,
+		   a.RSZipCode,
+		   a.RSPhone,
+		   a.Laboratory,
+		   a.LabCity,
+		   a.LabState,
+		   a.ClusterID,
+		   a.PtHospitalized,
+		   a.Inpatient,
+		   a.Hospital,
+		   a.DtOnset,
+		   a.DtLabCollect,
+		   a.DtLabResult,
+		   a.DtDiagnosis,
+		   a.DtDeath,
+		   a.DtReceived,
+		   a.DtCreate,
+		   a.DtEpisode,
+		   a.DtClosed,
+		   a.DtAdmit,
+		   a.Dtdischarge,
+		   a.Istatus,
+		   a.Pstatus,
+		   a.Rstatus,
+		   a.DtLastEdit,
+		   a.report,
+		   b.HEPCCLICRRSNTSTRSN as tstreas,
+		   b.HEPCCLICRRSNTSTRSNSPFY as tstreasspfy,
+		   c.HEPCCLICRSIGNSXSYMPTOMATIC as symptomatic,
+		   c.HEPCCLICRSIGNSXSX as sxs,
+		   c.HEPCCLICRSIGNSXSXSPFY as sxsspfy,
+		   d.COMPOTHSXDIED as died,
+		   e.HOSPER as er,
+		   e.HOSPHOSPITALIZED as hosp,
+		   e.HOSPDAYSHOSP as hospnites,
+		   f.HEPCCLICRVACHXIMMHEPB as hbvax,
+		   f.HEPCCLICRVACHXVACTYPEHEPB as hbvaxtype,
+		   f.HEPCCLICRVACHXVAC1HEPB as hbvax1,
+		   f.HEPCCLICRVACHXVAC1DTHEPB as hbvax1dt,
+		   f.HEPCCLICRVACHXVAC2HEPB as hbvax2,
+		   f.HEPCCLICRVACHXVAC2DTHEPB as hbvax2dt,
+		   f.HEPCCLICRVACHXVAC3HEPB as hbvax3,
+		   f.HEPCCLICRVACHXVAC3DTHEPB as hbvax3dt,
+  		   f.HEPCCLICRVACHXRSNNOTVAC as notvaxreas,
+		   f.HEPCCLICRVACHXANTIHBTST as pvst,
+		   f.HEPCCLICRVACHXANTIHBTSTSERUM as pvstr,
+		   f.HEPCCLICRVACHXIMMHEPA as havax,
+		   f.HEPCCLICRVACHXVACTYPEHEPA as havaxtype,
+		   f.HEPCCLICRVACHXVAC1HEPA as havax1,
+		   f.HEPCCLICRVACHXVAC1DTHEPA as havax1dt,
+		   f.HEPCCLICRVACHXVAC2HEPA as havax2,
+		   f.HEPCCLICRVACHXVAC2DTHEPA as havax2dt,
+		   f.HEPCCLICRVACHXCOMMENTS as vaxcomment,
+		   g.DXLVRENZLEVALTSGPTRSLT as rawalt,
+		   g.DXLVRENZLEVALTSGPTDT as altdt,
+		   g.DXLVRENZLEVALTSGOTRSLT as rawast,
+		   g.DXLVRENZLEVALTSGOTDT as astdt, 
+		   g.DXLVRENZLEVBILIRUBINRSLT as rawbili,
+		   g.DXLVRENZLEVBILIRUBINDT as bilidt,
+		   h.HEPCLABCRDXTSTANTIHCVRSLT as antihcvr,
+		   h.HEPCLABCRDXTSTANTIHCVCUTRATIO as antihcvrat,
+		   h.HEPCLABCRDXTSTANTIHCVTRUPOS as antihcvtrupos,
+		   h.HEPCLABCRDXTSTANTIHCVDT as antihcvdt,
+		   h.HEPCLABCRDXTSTHCVRIBARSLT as hcvribar,
+		   h.HEPCLABCRDXTSTHCVRIBADT as hcvribadt,
+		   h.HEPCLABCRDXTSTHCVRNARSLT as hcvqualr,
+		   h.HEPCLABCRDXTSTHCVRNADT as hcvqualdt,
+		   h.HEPCLABCRDXTSTGENOTYPE as hcvgen,
+		   i.HEPCLABCRDXTSTOTHHBSAGRSLT as hbsagr,
+		   i.HEPCLABCRDXTSTOTHHBSAGDT as hbsagdt,
+		   i.HEPCLABCRDXTSTOTHANTIHBCIGMRSLT as igmhbcr,
+		   i.HEPCLABCRDXTSTOTHANTIHBCIGMDT as igmhbcdt,
+		   i.HEPCLABCRDXTSTOTHANTIHBSRSLT as antihbsr,
+		   i.HEPCLABCRDXTSTOTHANTIHBSDT as antihbsdt,
+		   i.HEPCLABCRDXTSTOTHANTIHBCRSLT as antihbcr,
+		   i.HEPCLABCRDXTSTOThANTIHBCDT as antihbcdt,
+		   i.HEPCLABCRDXTSTOTHHBeAgRes as hbeagr,
+		   i.HEPCLABCRDXTSTOTHHBeAgDate as hbeagdt,
+		   i.HEPCLABCRDXTSTOTHHBVDNAQUALRES as hbvqualr,
+		   i.HEPCLABCRDXTSTOTHHBVDNAQUALDATE as hbvqualdt,
+		   i.HEPCLABCRDXTSTOTHHBVDNARES as hbviur,
+		   i.HEPCLABCRDXTSTOTHHBVDNADATE as hbviudt,  
+		   i.HEPCLABCRDXTSTOTHANTIHAVIGMRSLT as igmhavr,
+		   i.HEPCLABCRDXTSTOTHANTIHAVIGMDT as igmhavdt,
+		   i.HEPCLABCRDXTSTOTHANTIHAVRSLT as antihavr,
+		   i.HEPCLABCRDXTSTOTHANTIHAVDT as antihavdt,
+		   i.HEPCLABCRDXTSTOTHANTIHDVRSLT as antihdvr,
+		   i.HEPCLABCRDXTSTOTHANTIHDVDT as antihdvdt,
+		   i.HEPCLABCRDXTSTOTHANTIHEVRSLT as antihevr,
+		   i.HEPCLABCRDXTSTOTHANTIHEVDT as antihevdt
+from achcvcalredie as a left join acHCVcli_testrs as b
+on a.incidentid = input(b.incidentid, 8.)
+left join acHCVcli_sxs as c
+on a.incidentid = input(c.incidentid, 8.)
+left join acHCVcli_death as d
+on a.incidentid = input(d.incidentid, 8.)
+left join acHCVcli_hosp as e
+on a.incidentid = input(e.incidentid, 8.)
+left join acHCVcli_vxhx as f
+on a.incidentid = input(f.incidentid, 8.)
+left join acHCVlab_lftdx as g
+on a.incidentid = input(g.incidentid, 8.)
+left join acHCVlab_tst as h
+on a.incidentid = input(h.incidentid, 8.)
+left join acHCVlab_tstoth as i
+on a.incidentid = input(i.incidentid, 8.);
+quit;
+run;
+
+data calredie;
+set achbvcalredie
+	achcvcalredie
+	chhbvcalredie
+	chhcvcalredie;
+if cmrnumber ^= . then cmrnumber_temp = put(cmrnumber, 12.);
+if censusblock ^= . then censusblock_temp = put(censusblock, 5.);
+if zip ^= . then zip_temp = put(zip, 12.);
+if rszipcode ^= . then rszipcode_temp = put(rszipcode, 12.);
+if incidentid ^= . then id = put(incidentid, 11.);
+if cntyfips ^= . then cntyfips_temp = put(cntyfips, 7.);
+ctract_temp = put(ctract,8.);
+edd_temp = input(edd, MMDDYY10.);
+dtdischarge_temp = input(dtdischarge, MMDDYY10.);
+dtadmit_temp = input(dtadmit, MMDDYY10.);
+dtarrival_temp = input(dtarrival, MMDDYY10.);
+dtrptby_temp = input(dtrptby, MMDDYY10.);
+dtlabrpt_temp = input(dtlabrpt, MMDDYY10.);
+dth = input(dtdeath, MMDDYY10.);
+dtsent_temp = input(dtsent, MMDDYY10.); 
+don = input(dtonset, MMDDYY10.);
+dtlabcollect_temp = input(dtlabcollect, MMDDYY10.);
+drop cmrnumber censusblock zip rszipcode incidentid edd cntyfips dtdischarge  dtadmit dtarrival dtdeath dtlabcollect dtonset dtrptby dtlabrpt dtsent ctract;
+rename address = addr cmrnumber_temp = cmrnumber censusblock_temp = censusblock cntyfips_temp = cntyfips ctract_temp = ctract dtreceived = dat dtdiagnosis = ddx
+	   dtepisode = dep disshort = dis dtadmit_temp = dtadmit dtarrival_temp = dtarrival Dtdischarge_temp = dtdischarge 
+	   dtlabrpt_temp = dtlabrpt dtlabcollect_temp = dtlabcollect dtrptby_temp = dtrptby dtsent_temp = dtsent edd_temp = edd firstname = fna
+	   lhj = lhd lastname = lna rszipcode_temp = rszipcode zip_temp = zip;
+format edd_temp dtdischarge_temp don dtadmit_temp dtarrival_temp  dtlabcollect_temp dth mmddyy10.;
+run;
+
+data calredie.calrediecumul;
+set calredie;
+run;

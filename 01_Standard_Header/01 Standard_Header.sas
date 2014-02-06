@@ -1,7 +1,7 @@
 *=====================================================================;
 * Analyst : 		Adam Coutts
 * Created : 		March 14, 2011
-* Last Updated : 	July 25, 2013 by Darryl Kong
+* Last Updated : 	December 3, 2013 by Darryl Kong (change directories to allow a trial
 * Purpose : 		Assign libnames and generate user-defined formats
 *=====================================================================;
 
@@ -19,7 +19,7 @@
 
 * Assign shorthand library name for various data locations;
 * Must run %let statement at beginning of 00 Runfile.sas program for the macro variable "directory" to work;
-libname mainfldr "&directory.\Datasets";
+libname mainfldr "&directory.\Datasets\Trial";
 libname nick "&directory.\Nicknames";
 libname archive "&directory.\Datasets\Archived Data";
 
@@ -42,10 +42,10 @@ run;
 
 *Puts the merged Morbfile (CalREDIE/Morbfile/RAWvpd) as a temporary SAS file in work folder to view and check variables;
 data MorbFile;
-set "R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\hepb07022012.sas7bdat";
+set "R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\Morb2012.sas7bdat";
 run;
 data SFFTP;
-set "R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Archived Data\cdph_sf_chronic_b_dl06072012.sas7bdat";
+set "R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\SF\2012\cdph_sf_cases_chronicb.sas7bdat";
 run;
 
 proc format;

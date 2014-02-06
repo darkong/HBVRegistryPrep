@@ -1,0 +1,369 @@
+
+/**************************************************************************************************
+PROGRAM NAME: IZB NPJ chronic Hep B and C.sas
+DESCRIPTION	: Helped IZB extract 2012 and 2013 chronic Hep B & C from NPJ data sets
+   			  
+PROGRAMMER	: Tamara Hennessy-Burt
+DATE WRITTEN: 10/30/2013
+
+Edited 11/21/2013 by Darryl Kong
+
+INPUT FILES	: v37-2012.txt (San Diego data from 2012 & 2013) --> converted to xlsx file and concatenated 2012 and 
+YTD 2013 records
+			  v19-2012.txt (LA data from 2012 & 2013) --> converted to xlsx file and concatenated 2012 and 
+YTD 2013 records
+			  CMR12 and CMR13 (Alameda data from 2012 & 2013) --> converted to xlsx file and concatenated 
+2012 and YTD 2013 records
+			  r_110_12.bdat and r_110.bdat (AVSS data from 2012 & 2013) --> converted to xlsx file and 
+concatenated 2012 and YTD 2013 records
+
+OUTPUT FILES: IZB.HepAlameda IZB.HepAVSS IZB.HepLA IZB.HepSD
+				
+****************************************************/;
+libname izb 'R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\NonCalREDIE Cumulative\2012';
+
+
+/** Imported 2012 and 2013 Alameda data as Excel file **/
+/** Subset chronic hep B and C cases **/
+PROC IMPORT OUT= WORK.alameda 
+            DATAFILE= "R:\State Surveillance\HBV Data Analysis\HBV Match
+ 2012\Datasets\Source Data\Morb\NonCalREDIE Cumulative\2012\Alameda 2012 and 2013 data
+.xlsx" 
+            DBMS=EXCEL REPLACE;
+     RANGE="CMR12$"; 
+     GETNAMES=YES;
+     MIXED=NO;
+     SCANTEXT=YES;
+     USEDATE=YES;
+     SCANTIME=YES;
+RUN;
+
+data work.HepAlameda;
+set work.Alameda;
+/** 131=chronic Hep B; 137=chronic Hep C **/
+where disease in (131 137);
+run;
+
+/** Subset Alameda cases reported between 7/1/12 - 10/28/13 **/
+data izb.HepAlameda;
+set work.HepAlameda;
+where REPORTDT between '01JAN2012'D and '30JUN2013'D;
+run;
+
+ods html;
+proc contents data=izb.HepAlameda;
+run;
+
+ods html close; ods html;
+proc freq data = izb.HepAlameda;
+tables CENSUS HISPANIC NUMCASES ONSET RACE SSN;
+RUN;
+
+/** Rename and recode variables **/
+data izb.HepAlameda;
+set izb.HepAlameda;
+
+if disease=131 then diseaseCHAR='HEP-B-CR';
+else if disease=137 then diseaseCHAR='HEP-C-CR';
+
+if SSN ne ' ' then SSN_num = ssn*1;
+else if SSN = ' ' then SSN_num = .;
+
+if RACE = 20 then RACE_char = 'African-American/Black';
+else if RACE = 10 then RACE_char = 'White';
+else if RACE = 42 then RACE_char = 'Chinese';
+else if RACE = 53 then RACE_char = 'Filipino';
+else if RACE = 40 then RACE_char = 'Other Asian/Pac Isl';
+else if RACE = 52 then RACE_char = 'Asian-Indian';
+else if RACE = 46 then RACE_char = 'Cambodian';
+else if RACE = 43 then RACE_char = 'Japanese';
+else if RACE = 45 then RACE_char = 'Vietnamese';
+else if RACE = . then RACE_char = ' ';
+
+if NUMCASES = ' ' then NUMCASES_num = .;
+
+onset_dt=input(onset,anydtdte10.);
+format onset_dt date9.;
+run;
+
+data izb.HepAlameda (drop = disease ssn race numcases onset
+					 rename = (diseaseCHAR=DISEASE SSN_num=SSN RACE_char=RACE NUMCASES_num=NUMCASES 
+onset_dt=ONSET));
+set izb.HepAlameda;
+run;
+
+
+/** Imported 2012 and 2013 AVSS data as Excel file **/
+/** Subset chronic hep B and C cases **/
+PROC IMPORT OUT= WORK.Avss 
+            DATAFILE= "R:\State Surveillance\HBV Data Analysis\HBV Match
+ 2012\Datasets\Source Data\Morb\NonCalREDIE Cumulative\2012\AVSS 2012 and 2013 data
+.xlsx" 
+            DBMS=EXCEL REPLACE;
+     RANGE="Sheet1$"; 
+     GETNAMES=YES;
+     MIXED=NO;
+     SCANTEXT=YES;
+     USEDATE=YES;
+     SCANTIME=YES;
+RUN;
+
+
+data work.HepAVSS;
+set work.AVSS;
+where disease in ('HEP-C-CR' 'HEP-B-CR');
+run;
+
+/** Subset AVSS cases reported between 7/1/12 - 10/28/13 **/
+data izb.HepAVSS;
+set work.HepAVSS;
+where REPORTDT between '01JAN2012'D and '30JUN2013'D;
+run;
+
+/** Rename and recode variables **/
+data izb.HepAVSSb;
+set izb.HepAVSS;
+
+if SSN = '-' or SSN = ' ' then SSN_num = . ;
+else SSN_num = ssn*1 ;
+
+if CENSUS ne ' ' then CENSUS_num = CENSUS*1;
+else if CENSUS = ' ' then CENSUS_num = .;
+
+if RACE = 'N'  then RACE_long = 'Native American/Alaskan Native';
+else if RACE = 'W'  then RACE_long = 'White';
+else if RACE = 'AC' then RACE_long = 'Chinese';
+else if RACE = 'H'  then RACE_long = 'Hispanic';
+else if RACE = 'A'  then RACE_long = 'Asian';
+else if RACE = 'AI' then RACE_long = 'Asian-Indian';
+else if RACE = 'B' then RACE_long = 'African-American/Black';
+else if RACE = 'O'  then RACE_long = 'Other';
+else if RACE = 'U'  then RACE_long = 'Unknown';
+
+onset_dt=input(onset,anydtdte10.);
+format onset_dt date9. SSN_num z9. CENSUS_num z6.;
+run;
+
+data izb.HepAVSS (drop = ssn census race onset F26
+				  rename = (SSN_num=SSN RACE_long=RACE CENSUS_num=CENSUS onset_dt=ONSET));
+set izb.HepAVSSb;
+run;
+
+ods html close; ods html;
+proc contents data=izb.HepAVSS;
+run;
+
+ods html close; ods html;
+proc freq data = izb.HepAVSS;
+tables CENSUS NUMCASES ONSET RACE SSN;
+RUN;
+
+/** Imported 2012 and 2013 LA data as Excel file **/
+/** Subset chronic hep B and C cases **/
+PROC IMPORT OUT= WORK.la 
+            DATAFILE= "R:\State Surveillance\HBV Data Analysis\HBV Match
+ 2012\Datasets\Source Data\Morb\NonCalREDIE Cumulative\2012\LA 2012 and 2013 data.x
+lsx" 
+            DBMS=EXCEL REPLACE;
+     RANGE="'v19-2012$'"; 
+     GETNAMES=YES;
+     MIXED=NO;
+     SCANTEXT=YES;
+     USEDATE=YES;
+     SCANTIME=YES;
+RUN;
+
+
+data work.HepLA;
+set work.LA;
+where disshort in ('HEP-C-CR' 'HEP-B-CR');
+run;
+
+/** Subset LA cases reported between 7/1/12 - 10/28/13 **/
+data izb.HepLA (rename = (Date_Received = REPORTDT));
+set work.HepLA;
+where Date_Received between '01JAN2012'D and '30JUN2013'D;
+run;
+
+/** Rename and recode variables **/
+data izb.HepLAb;
+set izb.HepLA;
+
+if SSN = 'UNK' then SSN = ' ';
+SSN2 = compress(SSN,'-');
+SSN_num = SSN2*1;
+
+if HISPANIC = '1' then HISPANIC = 'Y';
+else if HISPANIC = '2' then HISPANIC = 'N';
+else if HISPANIC = '4' then HISPANIC = 'U';
+
+if HOMEPHONE in ('N/A' 'NONE' 'NOTGIVEN' 'NP' 'n/a' 'nonegiven' '~') then HOMEPHONE = ' ';
+HOMEPHONE2 = compress(HOMEPHONE,'()~/CELLHM.GUAM');
+HOMEPHONE_num = HOMEPHONE2*1; 
+
+onset_dt=input(onset,anydtdte10.);
+Specimen_Collected_Date_dt=input(Specimen_Collected_Date,anydtdte10.);
+format onset_dt date9. Specimen_Collected_Date_dt date9.;
+run;
+
+data izb.HepLA (drop = SSN SSN2 HOMEPHONE HOMEPHONE2 onset Specimen_Collected_Date 
+				  rename = (SSN_num=SSN HOMEPHONE_num=HOMEPHONE onset_dt=ONSET 
+Specimen_Collected_Date_dt=Specimen_Collected_Date));
+set izb.HepLAb;
+run;
+
+ods html close; ods html;
+proc contents data=izb.HepLA;
+run;
+
+ods html close; ods html;
+proc FREQ data=izb.HepLAb;
+tables SSN;
+run;
+
+/** Imported 2012 and 2013 San Diego data as Excel file **/
+/** Subset chronic hep B and C cases **/
+PROC IMPORT OUT= WORK.sd 
+            DATAFILE= "R:\State Surveillance\HBV Data Analysis\HBV Match
+ 2012\Datasets\Source Data\Morb\NonCalREDIE Cumulative\2012\SD 2012 and 2013 data.x
+lsx" 
+            DBMS=EXCEL REPLACE;
+     RANGE="'v37-2012$'"; 
+     GETNAMES=YES;
+     MIXED=NO;
+     SCANTEXT=YES;
+     USEDATE=YES;
+     SCANTIME=YES;
+RUN;
+
+
+data work.HepSD;
+set work.SD;
+where disshort in ('HEP-C-CR' 'HEP-B-CR');
+run;
+
+/** Subset San Diego cases reported between 7/1/12 - 10/28/13 **/
+data izb.HepSD (rename = (Date_Received = REPORTDT));
+set work.HepSD;
+where Date_Received between '01JAN2012'D and '30JUN2013'D;
+run;
+
+/** Rename and recode variables **/
+data izb.HepSDb (drop = ICD9CODE);
+set izb.HepSD;
+
+if HISPANIC = 1 then HISPANIC_char = 'Y';
+else if HISPANIC = 2 then HISPANIC_char = 'N';
+else if HISPANIC = 4 then HISPANIC_char = 'U';
+else if HISPANIC = . then HISPANIC_char = ' ';
+
+if CENSUS = 'N/A' then CENSUS = ' '; 
+CENSUS_num = CENSUS*1;
+run;
+
+data izb.HepSD (drop = HISPANIC CENSUS 
+				  rename = (HISPANIC_char=HISPANIC CENSUS_num=CENSUS));
+set izb.HepSDb;
+run;
+
+ods html close; ods html;
+proc contents data=izb.HepSD;
+run;
+
+
+/** Combine **/
+data hepalameda;
+set izb.hepalameda;
+disshort = disease;
+run;
+
+data hepavss;
+set izb.hepavss;
+disshort = disease;
+run;
+
+data hepla;
+set izb.hepla;
+run;
+
+data hepsd;
+set izb.hepsd;
+run;
+
+
+/** Concatenate data sets **/
+
+data noncalredie;
+informat address $67.
+	   city $45.
+	   county $15.
+	   death $10.
+	   disease $53.
+	   disshort $21.
+	   ethnicity $23.
+	   expdat $10.
+	   fname $21.
+	   gender $1.
+	   hispanic $1.
+	   ispregnant $1.
+	   laboratory_name $50.
+	   lname $25.
+	   mi $18.
+	   occupation $48.
+	   race $41.
+	   report $8.
+	   reporter $81.
+	   reporting_facility_name $81.
+	   rsphone $28.;
+format address $67.
+	   city $45.
+	   county $15.
+	   death $10.
+	   disease $53.
+	   disshort $21.
+	   ethnicity $23.
+	   expdat $10.
+	   fname $21.
+	   gender $1.
+	   hispanic $1.
+	   ispregnant $1.
+	   laboratory_name $50.
+	   lname $25.
+	   mi $18.
+	   occupation $48.
+	   race $41.
+	   report $8.
+	   reporter $81.
+	   reporting_facility_name $81.
+	   rsphone $28.;
+set hepalameda
+	hepavss
+	hepla
+	hepsd;
+edd = input(expdate, MMDDYY10.);
+dth = input(death, MMDDYY10.);
+dtcreate = reportdt;
+ctract = put(census, 8.);
+if cmrid ^= . then id = put(cmrid, 12.);
+if homephone ^= . then homephone_temp = put(homephone, 31.);
+if ssn ^= . then ssn_temp = put(ssn, 14.);
+if zip ^= . then zip_temp = put(zip, 12.);
+if hispanic = 'N' then ethnicity = 'Non-Hispanic/Non-Latino';
+if hispanic = 'Y' then ethnicity = 'Hispanic/Latino';
+if hispanic in ('U','') then ethnicity = 'Unknown';
+if upcase(race) = 'HISPANIC' then do;
+	ethnicity = 'Hispanic/Latino';
+	race = 'Unknown';
+end;
+if upcase(race) = 'MEXICAN' then ethnicity = 'Hispanic/Latino';
+report = 'Morb';
+trial = length(fname);
+drop homephone ssn zip datecreated census;
+rename address = addr diagnosis = ddx episode_date = dep disshort = dis onset = don dateclosed = dtclosed
+	   specimen_collected_date = dtlabcollect reportdt = dtrptby fname = fna homephone_temp = homephone county = lhd lname = lna mi = mna ispregnant = pregnant
+	   reporting_facility_name = rslocation reporter = rsname gender = sex ssn_temp = ssn zip_temp = zip;
+run;
+
+data izb.noncalrediecumul;
+set noncalredie;
+run;

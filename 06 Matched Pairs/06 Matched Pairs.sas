@@ -196,7 +196,7 @@ quit;
 %create_weights_fmt (data=archive.main01, var=first_name, fmtname=fname_a, log=1, asian_adjust=TRUE);
 %create_weights_fmt (data=archive.main01, var=last_name, fmtname=lname_w,log=1);
 %create_weights_fmt (data=setx11, var=zip, fmtname=zip_w,log=1);
-%create_weights_fmt (data=archiver.main01, var=date_of_birth, fmtname=dob_w,log=1);
+%create_weights_fmt (data=archive.main01, var=date_of_birth, fmtname=dob_w,log=1);
 %create_weights_fmt (data=setx11, var=local_health_juris, fmtname=lhj_w,log=1);
 * Create un-logarithmic weights for comparisons;
 %create_weights_fmt (data=archive.main01, var=first_name, fmtname=fname_c,log=2);

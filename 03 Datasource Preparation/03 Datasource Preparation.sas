@@ -1,7 +1,7 @@
 *=====================================================================;
 * Analyst: 		Adam Coutts
 * Created: 		March 27, 2011
-* Last updated:	May 29, 2012 by Alexia Exarchos
+* Last updated:	December 3, 2013 by Darryl Kong, amended episode date derivations
 * Purpose: 		Prepare data from various datasets for merging - 
 					rename data, recode, etc. - then save to permanent 
 					datasets
@@ -150,9 +150,11 @@ if (notdigit(zip) > 5 | notdigit(strip(zip)) = 0) then
 		DON = date_of_onset
 		DDX = date_of_diagnosis
 		DTH = date_of_death
-		DAT = episode_date_1
-		TD = episode_date_2
-		DUP = episode_date_3;
+		dep = episode_date_1
+		dtcreate = episode_date_2
+		dat = episode_date_3
+		dtsubmit = episode_date_4
+		dtlabcollect = collection_date;
 
 * Select CHRONIC HBV cases;
 if dis = 'HEP-B-CR';
