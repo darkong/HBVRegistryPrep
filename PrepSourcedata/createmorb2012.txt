@@ -1,0 +1,305 @@
+libname morb 'R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb';
+libname izb 'R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\NonCalREDIE Cumulative\2012';
+libname newphpp 'R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\PHPP Cumulative\2012';
+libname calredie 'R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\CalREDIE Cumulative\2012';
+libname hbvdest 'R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\Year Specific Morbs\2012';
+libname hcvdest 'R:\State Surveillance\Chronic HCV Data Analysis\Chronic HCV SAS Files';
+
+
+data template;
+  attrib addr length = $80. format = $80. informat = $80.;
+  attrib Age length = 8. format = 8. informat = 8.;
+  attrib AptNo length = $20. format = $20. informat = $20.;
+  attrib CMRNumber	length = $12. format = $12. informat = $12.;
+  attrib CTract	length = $8. format = $8. informat = $8.; 
+  attrib CellPhone	length = $18. format = $18. informat = $18.;
+  attrib CensusBlock length = $5. format = $5. informat = $5.;
+  attrib City length =	$45.  format = $45. informat = $45.;
+  attrib ClusterID length = $7. format = $7. informat = $7.;
+  attrib CntyFIPS length = $7. format = $7. informat = $7.;
+  attrib CntyGEO length = $21. format = $21. informat = $8.;
+  attrib CntyOfResid length = $15. format = $15. informat = $15.;
+  attrib Country length = $25. format = $25. informat = $25.;
+  attrib CountryBirth length = $38. format = $38. informat = $38.;
+  attrib DAT length = 8. format = mmddyy. informat = 8.;
+  attrib DDX length = 8. format = mmddyy. informat = 8.;
+  attrib DEP length = 8. format = mmddyy. informat = 8.;
+  attrib DIS length = $21. format = $21. informat = $21.; 
+  attrib DOB length = 8. format = mmddyy. informat = 8.;
+  attrib DON length = 8. format = mmddyy. informat = 8.;
+  attrib DTH length = 8. format = mmddyy. informat = 8.;
+  attrib Disease length = $70. format = $70. informat = $70.;
+  attrib DiseaseGrp length = $163. format = $163. informat = $163.;
+  attrib DtAdmit length = 8. format = mmddyy. informat = 8.;
+  attrib DtArrival length = 8. format = mmddyy. informat = 8.;
+  attrib DtClosed length = 8. format = mmddyy. informat = 8.;
+  attrib DtCreate length = 8. format = mmddyy. informat = 8.;
+  attrib DtDischarge length = 8. format = mmddyy. informat = 8.;
+  attrib DtLabCollect length = 8. format = mmddyy. informat = 8.;
+  attrib DtLabRpt length = 8. format = mmddyy. informat = 8.;
+  attrib DtRptBy length = 8. format = mmddyy. informat = 8.;
+  attrib DtSent	length = 8. format = mmddyy. informat = 8.;
+  attrib DtSubmit length = 8. format = mmddyy. informat = 8.;
+  attrib EDD length = 8. format = mmddyy. informat = 8.;
+  attrib Ethnicity length = $23. format = $23. informat = $23.;
+  attrib Exposure length = $1. format = $1. informat = $1.;
+  attrib FDAR length = 8. format = 1. informat = 8.;
+  attrib FDDX length = 8. format = 1. informat = 8.;
+  attrib FDOB length = 8. format = 1. informat = 8.;
+  attrib FDON length = 8. format = 1. informat = 8.;
+  attrib FDTH length = 8. format = 1. informat = 8.;
+  attrib FNA length = $21. format = $21. informat = $21.; 
+  attrib FinalDispo	length = $19. format = $19. informat = $19.;
+  attrib HomePhone length = $31. format = $31. informat = $31.;
+  attrib Hospital length = $50. format = $50. informat = $50.;
+  attrib ID	length = $11. format = $11. informat = $11. ;
+  attrib IStatus length = $55. format = $55. informat = $55.;
+  attrib InPatient length = $1. format = $1. informat = $1.;
+  attrib IncidentID length = $11. format = $11. informat = $11.;
+  attrib IndexCase length = $1. format = $1. informat = $1.;
+  attrib Investigator length = $27. format = $27. informat = $27.; 
+  attrib LHD length = $15. format = $15. informat = $15.;
+  attrib LHJNumber length = 8. format = 8. informat = 8.;
+  attrib LNA length = $25. format = $25. informat = $25.;
+  attrib Laboratory	length = $59. format = $59. informat = $59.;
+  attrib Language length = $37. format = $37. informat = $37.;
+  attrib Latitude length = 8. format = 8. informat = 8.;
+  attrib Longitude length = 8. format = 8. informat = 8.;
+  attrib MNA length = $18. format = $18. informat = $18.;
+  attrib MRN length = $23. format = $23. informat = $23.;
+  attrib NOC length = 8. format = 8. informat = 8.;
+  attrib NameSuffix length = $4. format = $4. informat = $4.;
+  attrib OCC length = $15. format = $15. informat = $15.;
+  attrib OccLocation length = $50. format = $50. informat = $50.;
+  attrib OccSettingSpec length = $50. format = $50. informat = $50.;
+  attrib OccSettingType length = $43. format = $43. informat = $43.;
+  attrib OccSpecify length = $50. format = $50. informat = $50.;
+  attrib Occupation length = $56. format = $56. informat = $56.;
+  attrib OtherDisease length = $1. format = $1. informat = $1.;
+  attrib OutPatient length = $1. format = $1. informat = $1.;
+  attrib OutbreakNum length = $14. format = $14. informat = $14.; 
+  attrib OutbreakType length = $17. format = $17. informat = $17.;
+  attrib PStatus length = $21. format = $21. informat = $21.;
+  attrib Pregnant length = $1. format = $1. informat = $1.;
+  attrib PtDiedIllness length = $1. format = $1. informat = $1.;
+  attrib PtHospitalized	length = $1. format = $1. informat = $1.;
+  attrib RE	length = $2. length = $2. format = $2. informat = $2.;
+  attrib RPTBy length = $11. format = $11. informat = $11.;  
+  attrib RSAddress length = $67. format = $67. informat = $67.;  
+  attrib RSCity	length = $25. format = $25. informat = $25.;
+  attrib RSClass length = $14. format = $14. informat = $14.;
+  attrib RSLocType length = $69. format = $69. informat = $69.; 
+  attrib RSLocation length = $81. format = $81. informat = $81.;
+  attrib RSName	length = $113. format = $113. informat = $113.;
+  attrib RSPhone length = $28. format = $28. informat = $28.;
+  attrib RSState length = $6. format = $6. informat = $6.;
+  attrib RSZipCode length = $12. format = $12. informat = $12.;
+  attrib RStatus length = $19. format = $19. informat = $19.;
+  attrib Race length = $41. format = $41. informat = $41.;
+  attrib Region length = $13. format = $13. informat = $13.;
+  attrib Report length = $8. format = $8. informat = $8.;
+  attrib SOURCE length = $1. format = $1. informat = $1.;
+  attrib SSN length = $14. format = $14. informat = $14.;
+  attrib Sex length = $26. format = $26. informat = $26.;
+  attrib State length = $8. format = $8. informat = $8.;
+  attrib Submitter length = $105. format = $105. informat = $105.;
+  attrib Symptomatic length = $1. format = $1. informat = $1.;
+  attrib TStatus length = $1. format = $1. informat = $1.; 
+  attrib WorkPhone length = $30. format = $30. informat = $30.;
+  attrib XCTR length = $10. format = $10. informat = $10.;
+  attrib XCTRY length = $15. format = $15. informat = $15.;
+  attrib XDAR length = 8. format = 8. informat = 8.;
+  attrib XOCC length = $15. format = $15. informat = $15.;
+  attrib XOUT length = $12. format = $12. informat = $12.;
+  attrib XRTYP length = $3. format = $3. informat = $3.;
+  attrib XTYP length = $1. format = $1. informat = $1.;
+  attrib YEAR length = $2. format = $2. informat = $2.;
+  attrib Zip length = $12. format = $12. informat = $12.;
+  attrib ctyear length = 8 format = 8. informat = 8.;
+  attrib fname_points length = 8. format = 8. informat = 8.;
+  attrib lname_points length = 8. format = 8. informat = 8.;
+  attrib nickname length = $164. format = $164. informat = $164.;
+  attrib pdfl length = 8. format = 8. informat = 8.;
+  attrib pdup length = 8. format = 8. informat = 8.;
+  attrib xtd length = 8. format = 8. informat = 8.;
+  attrib alt length = 8. format = 8. informat = 8.;
+  attrib altdt length = 8. format = mmddyy. informat = 8.;
+  attrib antihbsr length = $3. format = $3. informat = $3.;
+  attrib antihavdt length = 8. format = mmddyy. informat = 8.;
+  attrib antihavr length = $3. format = $3. informat = $3.;
+  attrib antihbcdt length = 8. format = mmddyy. informat = 8.;
+  attrib antihbcr length = $3. format = $3. informat = $3.;
+  attrib antihbsdt length = 8. format = mmddyy. informat = 8.;
+  attrib antihcvdt length = 8. format = mmddyy. informat = 8.;
+  attrib antihcvr length = $3. format = $3. informat = 8.;
+  attrib antihcvrat	length = $30. format = $30. informat = $30.;
+  attrib antihcvtrupos length = $1. format = $1. informat = $1.;
+  attrib antihdvdt length = 8. format = mmddyy. informat = 8.;
+  attrib antihdvr length = $3. format = $3. informat = $3.;
+  attrib antihevdt length = 8. format = mmddyy. informat = 8.;
+  attrib antihevr length = $3. format = $3. informat = $3.;
+  attrib ast length = 8. format = 8. informat = 8.;
+  attrib astdt length = 8. format = mmddyy. informat = 8.;
+  attrib bili length = 8. format = 8. informat = 8.;
+  attrib bilidt length = 8. format = mmddyy. informat = 8.;
+  attrib died length = $1. format = $1. informat = $1.;
+  attrib er length = $1. format = $1. informat = $1.;
+  attrib havax length = $1. format = $1. informat = $1.;
+  attrib havax1 length = $1. format = $1. informat = $1.;
+  attrib havax2 length = $1. format = $1. informat = $1.;
+  attrib havax1dt length = 8. format = mmddyy. informat = 8.;
+  attrib havax2dt length = 8. format = mmddyy. informat = 8.;
+  attrib havaxtype length = $11. format = $11. informat = $11.;
+  attrib hbeagdt length = 8. format = mmddyy. informat = 8.;
+  attrib hbeagr length = $3. format = $3. informat = $3.;
+  attrib hbsagdt length = 8. format = mmddyy. informat = 8.;
+  attrib hbsagr length = $3. format = $3. informat = $3.;
+  attrib hbvax length = $1. format = $1. informat = $1.;
+  attrib hbvax1 length = $1. format = $1. informat = $1.;
+  attrib hbvax2	length = $1. format = $1. informat = $1.;
+  attrib hbvax3 length = $1. format = $1. informat = $1.;
+  attrib hbvax1dt length = 8. format = mmddyy. informat = 8.;
+  attrib hbvax2dt length = 8. format = mmddyy. informat = 8.;
+  attrib hbvax3dt length = 8. format = mmddyy. informat = 8.;
+  attrib hbvaxtype length = $27. format = $27. informat = $27.;
+  attrib hbviudt length = 8. format = mmddyy. informat = 8.;
+  attrib hbviur length = $14. format = $14. informat = $14.;
+  attrib hbvqualdt length = 8. format = mmddyy. informat = 8.;
+  attrib hbvqualr length = $15. format = $15. informat = $15.;
+  attrib hcvgen length = $21. format = $21. informat = $21.;
+  attrib hcvqualdt length = 8. format = mmddyy. informat = 8.;
+  attrib hcvqualr length = $3. format = $3. informat = $3.;
+  attrib hcvribadt length = 8. format = mmddyy. informat = 8.;
+  attrib hcvribar length = $3. format = $3. informat = $3.;
+  attrib hosp length = $1. format = $1. informat = $1.;
+  attrib hospnites length = $48. format = $48. informat = $48.; 
+  attrib igmhavdt length = 8. format = mmddyy. informat = 8.;
+  attrib igmhavr length = $3. format = $3. informat = $3.;
+  attrib igmhbcdt length = 8. format = mmddyy. informat = 8.;
+  attrib igmhbcr length = $3. format = $3. informat = $3.;
+  attrib notvaxreas length = $35. format = $35. informat = $35.;
+  attrib pvst length = $1. format = $1. informat = $1.;
+  attrib pvstr length = $1. format = $1. informat = $1.;
+  attrib sxs length = $51. format = $51. informat = $51.;
+  attrib sxsspfy length = $105 format = $105. informat = $105.;
+  attrib symptomatic length = $1. format = $1. informat = $1.;
+  attrib tstreas length = $26. format = $26. informat = $26.;
+  attrib tstreasspfy length = $101. format = $101. informat = $101.;
+  attrib vaxcomment length = $619. format = $619. informat = $619.;
+run;
+
+/** Get olddata **/
+data oldmorb;
+set morb.morb (drop = resolution);
+run;
+
+/** Get nonCalREDIE data **/
+data noncalredie;
+set template (in = a)
+	izb.noncalrediecumul;
+if a then delete;
+keep ADDR Age AptNo CMRNumber CTract CellPhone CensusBlock City ClusterID CntyFIPS CntyGEO CntyOfResid Country CountryBirth DAT DDX DEP DIS DOB DON DTH
+     Disease DiseaseGrp DtAdmit DtArrival DtClosed DtCreate DtDischarge DtLabCollect DtLabRpt DtRptBy DtSent DtSubmit EDD Ethnicity Exposure FDAR FDDX 
+	 FDOB FDON FDTH FNA FinalDispo HomePhone Hospital ID IStatus InPatient IncidentID IndexCase Investigator LHD LHJNumber LNA Laboratory Language
+     Latitude Longitude MNA MRN NOC NameSuffix OCC OccLocation OccSettingSpec OccSettingType OccSpecify Occupation OtherDisease OutPatient OutbreakNum
+     OutbreakType PStatus Pregnant PtDiedIllness PtHospitalized RE RPTBy RSAddress RSCity  RSClass RSLocType RSLocation RSName RSPhone RSState RSZipCode
+     RStatus Race Region Report SOURCE SSN Sex State Submitter Symptomatic TStatus WorkPhone XCTR XCTRY XDAR XOCC XOUT XRTYP XTYP YEAR Zip ctyear fname_points
+     lname_points nickname pdfl pdup xtd alt altdt antihbsr antihavdt antihavr antihbcdt antihbcr antihbsdt antihcvdt antihcvr antihcvrat antihcvtrupos
+	 antihdvdt antihdvr antihevdt antihevr ast astdt bili bilidt died er havax havax1 havax2 havax1dt havax2dt havaxtype hbeagdt hbeagr hbsagdt hbsagr
+ 	 hbvax hbvax1 hbvax2 hbvax3 hbvax1dt hbvax2dt hbvax3dt hbvaxtype hbviudt hbviur hbvqualdt hbvqualr hcvgen hcvqualdt hcvqualr hcvribadt hcvribar
+	 hosp hospnites igmhavdt igmhavr igmhbcdt igmhbcr notvaxreas pvst pvstr sxs sxsspfy symptomatic tstreas tstreasspfy vaxcomment;
+run;
+
+
+
+/** Get CalREDIE data **/
+data calredie;
+set template (in = a)
+	calredie.calrediecumul;
+if a then delete;
+run;
+
+/** Get PHPP data **/
+
+data phpp;
+set template (in = a)
+	newphpp.phppcumul;
+if a then delete;
+keep ADDR Age AptNo CMRNumber CTract CellPhone CensusBlock City ClusterID CntyFIPS CntyGEO CntyOfResid Country CountryBirth DAT DDX DEP DIS DOB DON DTH
+     Disease DiseaseGrp DtAdmit DtArrival DtClosed DtCreate DtDischarge DtLabCollect DtLabRpt DtRptBy DtSent DtSubmit EDD Ethnicity Exposure FDAR FDDX 
+	 FDOB FDON FDTH FNA FinalDispo HomePhone Hospital ID IStatus InPatient IncidentID IndexCase Investigator LHD LHJNumber LNA Laboratory Language
+     Latitude Longitude MNA MRN NOC NameSuffix OCC OccLocation OccSettingSpec OccSettingType OccSpecify Occupation OtherDisease OutPatient OutbreakNum
+     OutbreakType PStatus Pregnant PtDiedIllness PtHospitalized RE RPTBy RSAddress RSCity  RSClass RSLocType RSLocation RSName RSPhone RSState RSZipCode
+     RStatus Race Region Report SOURCE SSN Sex State Submitter Symptomatic TStatus WorkPhone XCTR XCTRY XDAR XOCC XOUT XRTYP XTYP YEAR Zip ctyear fname_points
+     lname_points nickname pdfl pdup xtd alt altdt antihbsr antihavdt antihavr antihbcdt antihbcr antihbsdt antihcvdt antihcvr antihcvrat antihcvtrupos
+	 antihdvdt antihdvr antihevdt antihevr ast astdt bili bilidt died er havax havax1 havax2 havax1dt havax2dt havaxtype hbeagdt hbeagr hbsagdt hbsagr
+ 	 hbvax hbvax1 hbvax2 hbvax3 hbvax1dt hbvax2dt hbvax3dt hbvaxtype hbviudt hbviur hbvqualdt hbvqualr hcvgen hcvqualdt hcvqualr hcvribadt hcvribar
+	 hosp hospnites igmhavdt igmhavr igmhbcdt igmhbcr notvaxreas pvst pvstr sxs sxsspfy symptomatic tstreas tstreasspfy vaxcomment;
+run;
+
+/** Merge all **/
+
+data newmorb;
+set calredie
+	noncalredie
+	phpp;
+if sex = 'FEMALE' then sex = 'F';
+LHD = upcase(LHD);
+if LHD = 'BERKELEY CITY' then LHD = 'BERKELEY';
+if LHD = 'PASADENA CITY' then LHD = 'PASADENA';
+if LHD = 'LONG BEACH CITY' then LHD = 'LONG BEACH';
+race = upcase(race);
+if prxmatch("m/american indian|native american/oi", race) > 0 then race= 'American Indian/Alaska Native';
+if prxmatch("m/bangladesh/oi", race) > 0 then race= 'Asian - Bangladeshi';
+if prxmatch("m/cambodia/oi", race) > 0 then race= 'Asian - Cambodian';
+if prxmatch("m/chinese/oi", race) > 0 then race= 'Asian - Chinese';
+if prxmatch("m/filip|fillip|philip|phillip/oi", race) > 0 then race= 'Asian - Filipino';
+if prxmatch("m/hmong/oi", race) > 0 then race= 'Asian - Hmong';
+if prxmatch("m/asian india|asian-indian|asian - indian/oi", race) > 0 then race= 'Asian - Indian';
+if prxmatch("m/indones/oi", race) > 0 then race= 'Asian - Indonesian';
+if prxmatch("m/japan/oi", race) > 0 then race= 'Asian - Japanese';
+if prxmatch("m/korea/oi", race) > 0 then race= 'Asian - Korean';
+if prxmatch("m/laot/oi", race) > 0 then race= 'Asian - Laotian';
+if prxmatch("m/malay/oi", race) > 0 then race= 'Asian - Malaysian';
+if race in ('ASIAN', 'OTHER ASIAN', 'ASIAN - OTHER', 'ASIAN-OTHER', 'ASIAN - OTHER/UNKNOWN') then race = 'Asian - Other/Unknown';
+if prxmatch("m/pakist/oi", race) > 0 then race= 'Asian - Pakistani';
+if prxmatch("m/singap/oi", race) > 0 then race= 'Asian - Singaporean';
+if prxmatch("m/taiwan/oi", race) > 0 then race= 'Asian - Taiwanese';
+if prxmatch("m/thai/oi", race) > 0 then race= 'Asian - Thai';
+if prxmatch("m/viet/oi", race) > 0 then race= 'Asian - Vietnamese';
+if prxmatch("m/black/oi", race) > 0 then race= 'Black/African American';
+if prxmatch("m/multi/oi", race) > 0 then race= 'Multiple Races';
+if race = 'OTHER' then race= 'Other';
+if prxmatch("m/chamorro/oi", race) > 0 then race= 'Pacific Islander - Chamorro';
+if prxmatch("m/fiji/oi", race) > 0 then race= 'Pacific Islander - Fijian';
+if prxmatch("m/guam/oi", race) > 0 then race= 'Pacific Islander - Guamanian';
+if prxmatch("m/mashall/oi", race) > 0 then race= 'Pacific Islander - Marshallese';
+if prxmatch("m/hawaiian/oi", race) > 0 then race= 'Pacific Islander - Native Hawaiian';
+if race in ('PACIFIC ISLANDER', 'OTHER PACIFIC ISLANDER', 'PACIFIC ISLANDER - OTHER', 'PACIFIC ISLANDER-OTHER', 'PACIFIC ISLANDER - OTHER/UNKNOWN') then race = 'Pacific Islander - Other/Unknown';
+if prxmatch("m/palau/oi", race) > 0 then race= 'Pacific Islander - Palauan';
+if prxmatch("m/samoa/oi", race) > 0 then race= 'Pacific Islander - Samoan';
+if prxmatch("m/tonga/oi", race) > 0 then race= 'Pacific Islander - Tongan';
+if prxmatch("m/yape/oi", race) > 0 then race= 'Pacific Islander - Yapese';
+if race in ('UNKNOWN', 'UNK') then race = 'Unknown';
+if race in ('WHITE') then race = 'White';
+if race in ('API', 'ASIAN/PACIFIC ISLANDER', 'OTHER ASIAN/PAC ISL', 'ASIAN/PAC ISL', 'ASIAN/PACIFIC ISLANDER OTHER') then race = 'Asian/Pacific Islander';
+if prxmatch("m/mexican/oi", race) > 0 then race= 'White';
+if report = 'PHPP' or (report in ('Morb', 'CalREDIE') and dtcreate > mdy(12,31,2011) and dtcreate < mdy(10,1,2013));
+run;
+
+data hcvdest.hepc11222013;
+set newmorb;
+if dis in ('HEP-C', 'HEP-C-CR');
+run;
+
+data hbvdest.hepb11222013;
+set newmorb;
+if dis in ('HEP-B', 'HEP-B-CR');
+run;
+
+
+data morb.morb2012;
+set hbvdest.hepb11222013
+    oldmorb (in = a);
+if a = 1 and dat > mdy(12,31,2011) then delete;
+run;
