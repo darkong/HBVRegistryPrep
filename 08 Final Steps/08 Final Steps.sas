@@ -25,7 +25,8 @@ run;
 
 data main01 (keep = link_id best_first_name best_last_name best_middle_name best_ssn best_sex best_race_ethnicity best_date_of_birth country birthcountry patient_ID data_source
 		best_date_of_death prison_ever prison_firstrpt records_per firstdate dxdate main_diagnosis overall_diagnosis first_lhj common_lhj first_city common_city age agedx firstyear dxyear)
-	 main02 (keep = link_id id occupation date_of_onset date_of_diagnosis mmwr_year patient_address 
+	 main02 (keep = link_id id occupation date_of_onset date_of_diagnosis mmwr_year patient_address
+	    first_name last_name middle_name ssn sex race_ethnicity date_of_birth date_of_death
 		patient_city patient_zip_code census_tract account_name account_address account_city account_zip_code
 		local_health_juris laboratory diagnosis ordering_doctor episode_date_1 episode_date_2 episode_date_3
 		episode_date_4 collection_date result_date firstdate reporter_type prison patient_id data_source result_comment 
@@ -42,7 +43,7 @@ data main01 (keep = link_id best_first_name best_last_name best_middle_name best
 
 
 * Templates - so as to properly order variables in dataset;
-**DK CHANGE (ADD BEST AND CITY VARIABLES);
+**DK CHANGE (ADD BEST AND CITY VARIABLES to MAIN01 AND ADD RECORD LEVEL VARIABLES TO MAIN02);
 data template01;
 	attrib link_id length = 8. format = 8. informat = 8.;
 	attrib best_first_name length = $20. format = $20. informat = $20.;
@@ -74,6 +75,14 @@ data main01;
 
 data template02;
 	attrib link_id length = 8. format = 8. informat = 8.;
+	attrib first_name length = $20. format = $20. informat = $20.;
+	attrib last_name length = $35. format = $35. informat = $35.;
+	attrib middle_name length = $20. format = $20. informat = $20.;
+	attrib ssn length = 8. format = 9. informat = 9.;
+	attrib sex length = $1. format = $1. informat = $1.;
+	attrib race_ethnicity length = $35. format = $35. informat = $35.;
+	attrib date_of_birth length = 8. format = MMDDYY10. informat = MMDDYY10.;
+	attrib date_of_death length = 8. format = MMDDYY10. informat = MMDDYY10.;
 	attrib id length = 8. format = 8. informat = 8.;
 	attrib data_source length = $30. format = $30. informat = $30.;	
 	attrib occupation length = $25. format = $25. informat = $25.;

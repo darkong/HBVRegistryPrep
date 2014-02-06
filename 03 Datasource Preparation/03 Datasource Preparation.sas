@@ -75,14 +75,14 @@ run;
 
 data HBVprep1;
 	set HBVprep;
-
+* DK make race_ethnicity longer;
 * Create size and type of new variables that will be calculated;
 
 informat patient_id $20. race $35. data_source $22. ssn 9. 
 		account_address $80. account_city $22. account_zip_code patient_zip_code 8. 
 		occupation2 $25. local_health_juris $20. ordering_doctor $30.;
 
-format episode_date_1 mmddyy10. episode_date_2 mmddyy10. episode_date_3 mmddyy10. episode_date_4 mmddyy10. date_of_onset mmddyy10.
+format episode_date_1 mmddyy10. race_ethnicity $35. episode_date_2 mmddyy10. episode_date_3 mmddyy10. episode_date_4 mmddyy10. date_of_onset mmddyy10.
 		date_of_diagnosis mmddyy10. date_of_death mmddyy10. date_of_birth mmddyy10.;
 
 last_name = LNA;
@@ -118,14 +118,13 @@ end;
 		compatible with other datasets;
 sex = substr(sex,1,1);
 
-* Calculate race_ethnicity variable from seperate CalREDIE race and ethnicity variables;
+* * DK make race_ethnicity longer edit Asian algorithm;
 * Calculate race_ethnicity variable from seperate CalREADIE race and ethnicity variables;
 	if index(race, "Black") then race_ethnicity = 'Black/African-American';
 	if race = 'White' then race_ethnicity = 'White';
 	if race = "American Indian/Alaska Native" then race_ethnicity = "Native American/Alaskan Native";
-	if index(race,"Asian - ") then race_ethnicity = "Asian/Pacific Islander";
+	if index(race,"Asian") then race_ethnicity = "Asian/Pacific Islander";
 	if index(race,"Pacific Islander") then race_ethnicity = "Asian/Pacific Islander";
-	
 	if race = "Multiple Races" then race_ethnicity = "Multirace";
 	if ethnicity = "Hispanic/Latino" then race_ethnicity = "Hispanic/Latino";
 	else if race_ethnicity = ' ' then race_ethnicity = race;
@@ -213,3 +212,4 @@ data set004;
 		reastest_other reastest_unknown specoth_reastest specoth_race cnty_res; 
 
 run;
+
