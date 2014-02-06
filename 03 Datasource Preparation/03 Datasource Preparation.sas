@@ -1,7 +1,7 @@
 *=====================================================================;
 * Analyst: 		Adam Coutts
 * Created: 		March 27, 2011
-* Last updated:	December 3, 2013 by Darryl Kong, amended episode date derivations
+* Last updated:	January 2, 2014 by Darryl Kong, amended episode date derivations and reworked code to rename hbvprep variables to avoid errors
 * Purpose: 		Prepare data from various datasets for merging - 
 					rename data, recode, etc. - then save to permanent 
 					datasets
@@ -72,17 +72,34 @@ drop ssn occupation xocc;
 if LHD = 'SAN DIEGO' and RE = 'AA' then race = ' ';
 if LHD = 'SAN DIEGO' and RE = 'AA' then ethnicity = ' ';
 run;
+
 data HBVprep1;
 	set HBVprep;
 
 * Create size and type of new variables that will be calculated;
-	format episode_date_1 mmddyy10. episode_date_2 mmddyy10. episode_date_3 mmddyy10. episode_date_4 mmddyy10. date_of_onset mmddyy10.
-		date_of_diagnosis mmddyy10. date_of_death mmddyy10. date_of_birth mmddyy10.;
-	informat patient_id $20. race $35. data_source $22. ssn 9. 
+
+informat patient_id $20. race $35. data_source $22. ssn 9. 
 		account_address $80. account_city $22. account_zip_code patient_zip_code 8. 
-		middle_name $20. occupation2 $25. local_health_juris $20. ordering_doctor $30.
-		episode_date_1 mmddyy10. episode_date_2 mmddyy10. episode_date_3 mmddyy10. episode_date_4 mmddyy10. date_of_onset mmddyy10.
+		occupation2 $25. local_health_juris $20. ordering_doctor $30.;
+
+format episode_date_1 mmddyy10. episode_date_2 mmddyy10. episode_date_3 mmddyy10. episode_date_4 mmddyy10. date_of_onset mmddyy10.
 		date_of_diagnosis mmddyy10. date_of_death mmddyy10. date_of_birth mmddyy10.;
+
+last_name = LNA;
+first_name = FNA;
+middle_name = MNA;
+patient_address = ADDR;
+patient_city = CITY; 
+data_source	= REPORT; 
+date_of_birth = DOB;
+date_of_onset = DON;
+date_of_diagnosis =	DDX;
+date_of_death = DTH;
+episode_date_1 = dep; 
+episode_date_2 = dtcreate;
+episode_date_3 = dat; 
+episode_date_4 = dtsubmit; 
+collection_date	= dtlabcollect;
 
 * Convert from numeric to character;
 	patient_id = put(ID,8.);
@@ -92,11 +109,10 @@ data HBVprep1;
 		& missing(Zip) then Zip = state;
 
 * If middle name not missing and first name is, make middle name first name;
-if missing (FNA) & not missing (MNA) then do;
-	FNA = MNA;
-	MNA = '';
-	end;
-middle_name=MNA;
+if missing (first_name) & not missing (middle_name) then do;
+	first_name = middle_name;
+	middle_name = '';
+end;
 
 * Abreviate sex variable from full word down to one letter, so as to make 
 		compatible with other datasets;
@@ -139,35 +155,17 @@ if ssn1 notin ('','.') then ssn = put(compress (ssn1,"0123456789",'k'),9.);
 if (notdigit(zip) > 5 | notdigit(strip(zip)) = 0) then 
 	patient_zip_code = put (substr(zip,1,5),8.);
 
-* Rename variables to standardize them with other datasets;
-	rename
-		LNA = last_name 
-		FNA = first_name
-		ADDR = patient_address
-		CITY = patient_city
-		REPORT = data_source
-		DOB = date_of_birth
-		DON = date_of_onset
-		DDX = date_of_diagnosis
-		DTH = date_of_death
-		dep = episode_date_1
-		dtcreate = episode_date_2
-		dat = episode_date_3
-		dtsubmit = episode_date_4
-		dtlabcollect = collection_date;
-
 * Select CHRONIC HBV cases;
 if dis = 'HEP-B-CR';
 
 * Drop unnneeded variables;
-drop age aptno ctract cellphone CENSUSBLOCK CLUSTERID CMRNUMBER CntyOfResid 
-	DISEASE DiseaseGrp DtAdmit DtArrival DtClosed DtDischarge 
-	DtLabRpt DtSent EDD ethnicity FinalDispo HOMEPHONE 
-	HOSPITAL IndexCase INPATIENT LATITUDE LONGITUDE 
+drop ADDR age aptno ctract cellphone CENSUSBLOCK CITY CLUSTERID CMRNUMBER CntyOfResid dat
+	DDX dep DISEASE DiseaseGrp DOB DON DtAdmit DtArrival DtClosed dtcreate DtDischarge DTH 
+	dtlabcollect DtLabRpt DtSent dtsubmit EDD ethnicity FinalDispo FNA HOMEPHONE 
+	HOSPITAL IndexCase INPATIENT LATITUDE LNA LONGITUDE MNA
 	MRN namesuffix OccLocation OccSettingType OccSettingSpec
-	OutbreakNum OUTBREAKTYPE pregnant PStatus PtDiedIllness PtHospitalized race  
+	OutbreakNum OUTBREAKTYPE pregnant PStatus PtDiedIllness PtHospitalized race  REPORT
 	RPTBy RSNAME ssn1 STATE Submitter TStatus Zip id;
-
 run;
 
 
