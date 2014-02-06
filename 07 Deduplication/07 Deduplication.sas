@@ -1,245 +1,3 @@
-
-
-* Count number of records per link_id (i.e. how many episodes per deduplicated person-level record);
-proc freq data = setx14 order = freq noprint;
-    tables link_id / out = num_link_id;
-    run;
-
-
-
-
-* Macro to calculate best first, middle, and last name for each person;
-
-* First - macro to replace best choice for name (and its attendant date collected, commonality in the dataset as a whole,
-        and percent of records for this particular linked_id (ie unduplicated person));
-%macro replace;
-do; name_comp = &var1._name; comm_comp = common; perc_comp = percent; end
-%mend;
-
-* Main macro to identify best first, middle, last name for each person;
-%macro cntname (var1,var2,var3,var4);
-
-* First, calculate the frequency of each name for this person;
-proc freq data = setx14 (keep = link_id &var1._name) order = freq noprint;
-    by link_id;
-    where &var1._name ^= '';
-    tables &var1._name / out = best_name;
-    run;
-
-* For middle names, if there is disagreement between possibilities and one value matches the first letter of the
-        chosen best first name, then delete that value;
-%if &var3 = m %then %do;
-data best_name (keep = middle_name percent link_id);
-    merge best_name best_fname;
-    by link_id;
-    if percent < 100 & middle_name = substr(first_name,1,1) then delete;
-    run;
-%end;
-
-
-* Find how common each name is in the dataset at large;
-data best_name;
-    merge best_name (in = a) name_sex; * date_set;
-    by link_id;
-    if a;
-    common = put(&var1._name,$&var2.name_c.);
-    run;
-
-* Sort so that the most name each person is most often called shows up first, with how common the name
-    is in the dataset at large used as a tiebreaker;
-proc sort data=best_name; by link_id descending percent descending common; run;
-
-data best_&var3.name (keep = link_id &var1._name);
-    set best_name;
-    by link_id;
-
-    * Create some variables to retain, and compare one name value against another;
-    attrib name_comp length = $20.;
-    attrib perc_comp length = 8. format = 8.3;
-    attrib comm_comp length = 8. format = 8.3;
-
-    retain name_comp perc_comp comm_comp flag;
-
-    * If its the first record for this person, set the comparison variables as this records values;
-    if first.link_id then do;
-        name_comp = &var1._name;
-        perc_comp = percent;
-        comm_comp = common;
-        flag = 0;
-        end;
-
-    * If theres only one name used for the person, then no issue - just use that;
-    if percent = 100 then do;
-        * Set flag variable that indicates that variable has already been output;
-        flag = 1;
-        output;
-        end;
-
-    else do;
-
-    &var1._name = strip(&var1._name);
-    name_comp = strip(name_comp);
-
-    * For non-first ("comparison") records, compare them against the first, to see if they are a better choice;
-    if not first.link_id then do;
-        * If the comparison value starts with the current best name choice and then is longer, take the comparison value;
-        if length(&var1._name) > length(name_comp) then do;
-            if (name_comp = (substr(&var1._name,1,length(name_comp)))) then %replace;
-            end;
-        * If the current best name choice is four or more char and is contained within the comparison value, then take
-            the comparison value;
-        if length(name_comp) > 3 & index (&var1._name,name_comp) > 0 then %replace;
-        * If the current best name choice is short, and the comparison value is considerably longer,
-            then take the comparison value;
-        if (length(name_comp) < 3 & (length(&var1._name)/length(name_comp)) > 2.4) then %replace;
-        /* For women, if last names are flat-out different, then take the most recent name (that is the name the woman
-                is going by now, and will be better for matching with future records);
-        %if &var4. = 1 %then %do;
-        else if sex = "F" & not %samel(&var1._name,name_comp) & firstdate > date_comp then %replace;
-        %end;*/
-        * If the current best choice is used for the person a lot more times than the next most common value, then go
-            ahead and crown that one the winner;
-        if perc_comp > (percent * 2.5) & flag ne 1 & length(name_comp) > 1 then do;
-            &var1._name = name_comp;
-            flag = 1;
-            output;
-            end;
-        * If comparison value is a much more common spelling than the current best name choice,
-                take the comparison value;
-        if (common / comm_comp > 20) & length(&var1._name) > 2 then %replace;
-        * If percentage is tied, take the more common spelling;
-        if percent = perc_comp & (common > comm_comp) &
-            ((length(&var1._name) / length(name_comp)) > .5 | length(&var1._name) > 2) then %replace;
-        end;
-
-    end;
-
-    * If its the last of the possible name variables, then output the best name choice;
-    if last.link_id & flag ne 1 then do;
-        &var1._name = name_comp;
-        output;
-        end;
-
-    run;
-
-proc sort data = best_&var3.name nodup; by link_id; run;
-
-
-* Find people with the completely different names but still linked up as one case, to examine as part of QC;
-data &var3.nameprob (keep = link_id);
-    merge best_&var3.name (rename = (&var1._name = best_name)) setx14 (keep = link_id &var1._name sex);
-    by link_id;
-
-    if missing(best_name) | missing (&var1._name) then delete;
-
-    %if &var4. = 1 %then %do;
-    if %samel(best_name,&var1._name) then delete;
-    * Delete female last name cases - names may be totally different because of maiden/married name;
-    if sex = "F" then delete;
-    %end;
-
-    %if &var4. = 0 %then %do;
-    if %samef(best_name,&var1._name) then delete;
-    %end;
-
-    run;
-
-proc sort data = &var3.nameprob nodup; by link_id; run;
-
-%mend;
-
-%cntname (first,f,f,0);
-%cntname (middle,f,m,0);
-%cntname (last,l,l,1);
-
-
-data look_first (drop = link_id);
-    merge best_fname (rename = (first_name = best_fname)) setx14 (keep = link_id first_name);
-    by link_id;
-    if not missing (first_name) & not %samef(best_fname,first_name);
-    if length(first_name) = 1 or length(best_fname) = 1 then delete;
-    if length(best_fname) > length(first_name) then do;
-        if substr(best_fname,1,length(strip(first_name))) = strip(first_name) then delete;
-        end;
-    run;
-
-data look_last (drop = link_id);
-    merge best_lname (rename = (last_name = best_lname)) setx14 (keep = link_id last_name);
-    by link_id;
-    if not missing (last_name) & not %samef(best_lname,last_name);
-    if length(last_name) = 1 or length(best_lname) = 1 then delete;
-    if length(best_lname) > length(last_name) then do;
-        if substr(best_lname,1,length(strip(last_name))) = strip(last_name) then delete;
-        end;
-    run;
-
-proc sort nodup data=look_first; by best_fname; run;
-proc sort nodup data=look_last; by best_lname; run;
-
-data look_last look_last2;
-    set look_last;
-    if substr(last_name,1,2) = substr(best_lname,1,2) then output look_last;
-        else output look_last2;
-    run;
-
-data look_first look_first2;
-    set look_first;
-    if substr(first_name,1,2) = substr(best_fname,1,2) then output look_first;
-        else output look_first2;
-    run;
-
-
-* In situations where there is no middle name information, and there are several possible conflicting values for
-    first name, save the first name that is an initial, or less common, as the middle name;
-* First - find cases where there is no middle name information, and first name conflicts exist;
-data new_middle (keep = link_id first_name rename = (first_name = middle_name));
-    merge best_mname best_fname (rename = (first_name = best_fname)) setx14 (keep = link_id first_name);
-    by link_id;
-    * Only take cases where (1) middle name is missing or it is a initial subtring (usually, first initial)
-        of the alternate first name, (2) there is a value for first name that is clearly different (not a
-        nickname, not linguistically similar, not a intial substring) than the first name which was taken);
-    if (missing(middle_name) | substr(first_name,1,length(strip(middle_name))) = strip(middle_name))
-        & not missing (first_name) & not %samef(best_fname,first_name)
-        & not (substr(best_fname,1,length(strip(first_name))) = strip(first_name));
-    run;
-
-proc sort nodup data=new_middle; by link_id; run;
-
-* Only take cases with one new middle name (ie one alternative first name);
-data new_middle;
-    set new_middle;
-    by link_id;
-    if first.link_id & last.link_id;
-    run;
-
-* Create dataset with valid middle names;
-data best_mname;
-    set best_mname;
-    if not missing(middle_name);
-    run;
-
-* Combine traditionally found middle names and new middle names;
-data best_mname;
-    set best_mname new_middle;
-    run;
-
-proc sort data=best_mname; by link_id; run;
-
-* Sort all datasets for merging together on link_id;
-proc sort data=name_sex nodup; by link_id; run;
-proc sort data=best_ssn; by link_id; run;
-proc sort data=best_race ; by link_id; run;
-proc sort data=best_dob; by link_id; run;
-proc sort data=best_dod; by link_id; run;
-proc sort data=transg nodupkey; by link_id; run;
-proc sort data=num_link_id (keep = link_id count rename = (count = records_per)); by link_id; run;
-* First prison data sort so that S (state prison history) is over O (other prison/jail history), and
-    so O is over blanks;
-proc sort data=best_lhj; by link_id; run;
-proc sort data=prison_ever; by link_id descending prison_ever; run;
-proc sort data=prison_firstrpt; by link_id; run;
-* Then delete so as to only take the highest ranking record;
-proc sort data=prison_ever nodupkey; by link_id; run;
 *========================================================================;
 * Analyst: 		Adam Coutts
 * Created: 		June 2, 2011
@@ -392,6 +150,8 @@ data setx14;
 	merge set101 setx13 /*sex_name (in = sex_name)*/ reversal (in = reversal)
 	fnamedel (in = fnamedel) lnamedel (in = lnamedel);
 	by id;
+	patient_city = upcase(patient_city);
+	account_city = upcase(account_city);
 	* Set link_id (which in the code block above found multiple records per person) for cases where 
 		only one record for the person;
 	if link_id = . then link_id = id;
@@ -497,7 +257,6 @@ end;
 drop lhj;
 run;
 
-
 proc sort data=ptcity;
 by patient_zip_code;
 run;
@@ -564,7 +323,6 @@ local_health_juris=newlhj;
 patient_city = newpatient_city;
 drop lhj newlhj city newpatient_city;
 run;
-
 
 * Dataset of people to reverse first name and last name;
 data reversal2 (drop = reversal_flag);
@@ -716,9 +474,7 @@ data best_dob (keep = link_id date_of_birth);
 	date_of_birth = mdy (mdob,ddob,ydob);
 	run;
 
-
-
-* Compute best race/ethnicity value;
+**DK CHANGE compute using a simpler algorithm to compute best race/ethnicity value;
 * First, create frequencies;
 proc freq data = setx14 order = freq noprint;
 	by link_id;
@@ -726,59 +482,25 @@ proc freq data = setx14 order = freq noprint;
 	tables race_ethnicity / out = best_race;
 	run;
 
-* Create variable in race specificity format (so, in cases of disagreement, to, for example, take 
-		"Cambodian" over "Asian", and a specific race over "Other"); 
-data best_race  (keep = link_id link_idm race_ethnicity sort_race sort_racem percent);
-	set best_race;
-	sort_race = put(race_ethnicity,$racespec.);
-	link_idm=link_id;
-	sort_racem=sort_race;
-	run;
-
-proc sort data=best_race; by link_id sort_race descending percent; run;
-
-%lookahead(dsin=best_race,dsout=racetemp1,bygroup=link_id,vars=link_idm sort_racem,lookahead=1);
-
-proc sort data=racetemp1; by link_id sort_race descending percent; run;
-
-* Take only best fit race/ethnicity information;
-data racetemp;
-	set racetemp1;
-	by link_id sort_race descending percent;
-	id_comp=lag1(link_id);
-	sort_comp=lag1(sort_race);
-	
-	if percent > 50 then keeper=1;
-
-	else if id_comp = link_id then do;
-		if percent < 50 then keeper=-1;
-		* For values with lower race specificity, delete those and keep higher specificity;
-		else if sort_comp < sort_race then keeper=-1;
-		* Otherwise, with two conflicting race values with same level of specificity,
-				keep id to look at for potential problems;
-		else keeper=0;
-		end;
-
-	else if percent=50 and link_idm1 = link_id and sort_racem1 = sort_race then keeper=0;
-	else if percent=50 and link_idm1 = link_id and sort_racem1 > sort_race then keeper=1;
-	else if percent=50 then keeper=0;
-	else keeper=-1;
+proc sort data = best_race;
+by link_id percent;
 run;
 
-
-data best_race (keep = link_id race_ethnicity) RaceProb (keep = link_id);
-	set racetemp;
-	if keeper=1 then do;
-		drop keeper;
-		output best_race;
+data best_race;
+set best_race;
+by link_id;
+id_comp = lag1(link_id);
+comprace = lag1(race_ethnicity);
+comppercent = lag1(percent);
+if last.link_id then do;
+	if link_id = id_comp and percent = comppercent then do;
+	 	if race_ethnicity in ('White', 'Hispanic/Latino') and comprace in ('White', 'Hispanic/Latino') then race_ethnicity = 'Hispanic/Latino';
+	 	else race_ethnicity = 'Unknown';
 	end;
-	else if keeper=0 then do;
-		drop keeper;
-		output raceprob;
-	end;
-	else delete;
+end;
+if last.link_id;
+keep link_id race_ethnicity;
 run;
-
 
 
 * Has the person ever been in prison;
@@ -884,7 +606,7 @@ if last.link_id;
 keep link_id local_health_juris;
 run;
 
-**DK CHANGE;
+**DK CHANGE to get city stats;
 * Take city at time of first contact;
 data city_set;
 	set setx14 (keep = link_id firstdate patient_city  rename = (patient_city = first_city));
@@ -1167,7 +889,7 @@ proc sort data=prison_ever nodupkey; by link_id; run;
 
 * Merge all best values together with main set (setx14 - with values that are being replaced/standardized/optomized
 	deleted);
-**DK CHANGE (CREATE BEST VARIABLES, ADD IN CITY DATASETS);
+**DK CHANGE (CREATE BEST VARIABLES, ADD IN CITY DATASETS, DON'T REMOVE SETX14 VARIABLES);
 data setx15;
 	merge name_sex (rename = (sex = best_sex))
 		best_ssn (rename = (ssn = best_ssn))
@@ -1187,8 +909,7 @@ data setx15;
 		best_lname (rename = (last_name = best_last_name))
 		best_mname (rename = (middle_name = best_middle_name))
 		num_link_id
-		setx14 (drop = sex ssn race_ethnicity middle_name date_of_birth firstdate dxdate diagnosis2 reversal_flag
-			first_name last_name date_of_death);
+		setx14; 
 		by link_id;
 /*	if strip(sex) in ('','U') then sex = put(first_name,$name_sex.);*/
 	if sex = '' then sex = 'U';
@@ -1211,7 +932,6 @@ data setx15;
 * Sort problem cases by link_id, for merging;
 **DK CHANGE (REMOVE LHJPROB);
 
-proc sort data=raceprob nodupkey; by link_id; run;
 proc sort data=ssnprob nodupkey; by link_id; run;
 proc sort data=fnameprob nodupkey; by link_id; run;
 proc sort data=mnameprob nodupkey; by link_id; run;
@@ -1220,13 +940,12 @@ proc sort data=dodprob nodupkey; by link_id; run;
 
 
 * Merge all "problem" datasets - create text variable that identifies what the specific incongruence is;
-**DK CHANGE (REMOVE LHJ PROB);
+**DK CHANGE (REMOVE LHJPROB RACEPROB);
 data problems;
 	informat prob $30.;
-	merge raceprob (in =a) ssnprob (in=b) fnameprob (in=c) mnameprob (in = d) lnameprob (in = e) dodprob (in = f);
+	merge ssnprob (in=b) fnameprob (in=c) mnameprob (in = d) lnameprob (in = e) dodprob (in = f);
 	by link_id;
 	if b then prob = "ssn";
-	if a then prob = catx(", ",prob,"race");
 	if c then prob = catx(", ",prob,"first name");
 	if d then prob = catx(", ",prob,"mid init");
 	if e then prob = catx(", ",prob,"last name");
@@ -1247,3 +966,10 @@ data problems2;
 	if prob = "last name" & sex = "F" then delete;
 	if a;
 	run;
+
+
+	
+
+
+
+
