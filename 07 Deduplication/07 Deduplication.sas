@@ -891,7 +891,8 @@ proc sort data=prison_ever nodupkey; by link_id; run;
 	deleted);
 **DK CHANGE (CREATE BEST VARIABLES, ADD IN CITY DATASETS, DON'T REMOVE SETX14 VARIABLES);
 data setx15;
-	merge name_sex (rename = (sex = best_sex))
+	merge setx14 (drop = prison firstdate dxdate)
+	    name_sex (rename = (sex = best_sex))
 		best_ssn (rename = (ssn = best_ssn))
 		best_race (rename = (race_ethnicity = best_race_ethnicity))
 		best_dob (rename = (date_of_birth = best_date_of_birth))
@@ -908,8 +909,7 @@ data setx15;
 		best_fname (rename = (first_name = best_first_name))
 		best_lname (rename = (last_name = best_last_name))
 		best_mname (rename = (middle_name = best_middle_name))
-		num_link_id
-		setx14; 
+		num_link_id; 
 		by link_id;
 /*	if strip(sex) in ('','U') then sex = put(first_name,$name_sex.);*/
 	if sex = '' then sex = 'U';

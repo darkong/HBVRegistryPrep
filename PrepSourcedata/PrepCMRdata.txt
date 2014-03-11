@@ -1,10 +1,16 @@
-libname morb 'R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb';
-libname cmrs 'R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\cmrs\2012';
-libname izb 'R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\NonCalREDIE Cumulative\2012';
-libname newphpp 'R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\PHPP Cumulative\2012';
-libname calredie 'R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\CalREDIE Cumulative\2012';
-libname hbvdest 'R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\Year Specific Morbs\2012';
-libname hcvdest 'R:\State Surveillance\Chronic HCV Data Analysis\Chronic HCV SAS Files';
+libname cmrs 'R:\State Surveillance\HBV Data Analysis\HBV Match 2012\Datasets\Source Data\Morb\CMRs\2012';
+
+PROC IMPORT OUT= WORK.CMRS 
+            DATAFILE= "R:\State Surveillance\HBV Data Analysis\HBV Match
+ 2012\Datasets\Source Data\Morb\CMRs\2012\Hepatitis B CMRs.xlsx" 
+            DBMS=EXCEL REPLACE;
+     RANGE="Sheet1$"; 
+     GETNAMES=YES;
+     MIXED=NO;
+     SCANTEXT=YES;
+     USEDATE=YES;
+     SCANTIME=YES;
+RUN;
 
 
 data template;
@@ -189,85 +195,49 @@ data template;
   attrib vaxcomment length = $619. format = $619. informat = $619.;
 run;
 
-/** Get olddata **/
-data oldmorb;
-set morb.morb (drop = resolution);
-run;
-
-/** Get nonCalREDIE data **/
-data noncalredie;
-set template (in = a)
-	izb.noncalrediecumul;
-if a then delete;
-keep ADDR Age AptNo CMRNumber CTract CellPhone CensusBlock City ClusterID CntyFIPS CntyGEO CntyOfResid Country CountryBirth DAT DDX DEP DIS DOB DON DTH
-     Disease DiseaseGrp DtAdmit DtArrival DtClosed DtCreate DtDischarge DtLabCollect DtLabRpt DtRptBy DtSent DtSubmit EDD Ethnicity Exposure FDAR FDDX 
-	 FDOB FDON FDTH FNA FinalDispo HomePhone Hospital ID IStatus InPatient IncidentID IndexCase Investigator LHD LHJNumber LNA Laboratory Language
-     Latitude Longitude MNA MRN NOC NameSuffix OCC OccLocation OccSettingSpec OccSettingType OccSpecify Occupation OtherDisease OutPatient OutbreakNum
-     OutbreakType PStatus Pregnant PtDiedIllness PtHospitalized RE RPTBy RSAddress RSCity  RSClass RSLocType RSLocation RSName RSPhone RSState RSZipCode
-     RStatus Race Region Report SOURCE SSN Sex State Submitter Symptomatic TStatus WorkPhone XCTR XCTRY XDAR XOCC XOUT XRTYP XTYP YEAR Zip ctyear fname_points
-     lname_points nickname pdfl pdup xtd alt altdt antihbsr antihavdt antihavr antihbcdt antihbcr antihbsdt antihcvdt antihcvr antihcvrat antihcvtrupos
-	 antihdvdt antihdvr antihevdt antihevr ast astdt bili bilidt died er havax havax1 havax2 havax1dt havax2dt havaxtype hbeagdt hbeagr hbsagdt hbsagr
- 	 hbvax hbvax1 hbvax2 hbvax3 hbvax1dt hbvax2dt hbvax3dt hbvaxtype hbviudt hbviur hbvqualdt hbvqualr hcvgen hcvqualdt hcvqualr hcvribadt hcvribar
-	 hosp hospnites igmhavdt igmhavr igmhbcdt igmhbcr notvaxreas pvst pvstr sxs sxsspfy symptomatic tstreas tstreasspfy vaxcomment;
-run;
-
-/** Get CMRs data **/
 data cmrs;
-set template (in = a)
-	cmrs.cmrs;
-if a then delete;
-keep ADDR Age AptNo CMRNumber CTract CellPhone CensusBlock City ClusterID CntyFIPS CntyGEO CntyOfResid Country CountryBirth DAT DDX DEP DIS DOB DON DTH
-     Disease DiseaseGrp DtAdmit DtArrival DtClosed DtCreate DtDischarge DtLabCollect DtLabRpt DtRptBy DtSent DtSubmit EDD Ethnicity Exposure FDAR FDDX 
-	 FDOB FDON FDTH FNA FinalDispo HomePhone Hospital ID IStatus InPatient IncidentID IndexCase Investigator LHD LHJNumber LNA Laboratory Language
-     Latitude Longitude MNA MRN NOC NameSuffix OCC OccLocation OccSettingSpec OccSettingType OccSpecify Occupation OtherDisease OutPatient OutbreakNum
-     OutbreakType PStatus Pregnant PtDiedIllness PtHospitalized RE RPTBy RSAddress RSCity  RSClass RSLocType RSLocation RSName RSPhone RSState RSZipCode
-     RStatus Race Region Report SOURCE SSN Sex State Submitter Symptomatic TStatus WorkPhone XCTR XCTRY XDAR XOCC XOUT XRTYP XTYP YEAR Zip ctyear fname_points
-     lname_points nickname pdfl pdup xtd alt altdt antihbsr antihavdt antihavr antihbcdt antihbcr antihbsdt antihcvdt antihcvr antihcvrat antihcvtrupos
-	 antihdvdt antihdvr antihevdt antihevr ast astdt bili bilidt died er havax havax1 havax2 havax1dt havax2dt havaxtype hbeagdt hbeagr hbsagdt hbsagr
- 	 hbvax hbvax1 hbvax2 hbvax3 hbvax1dt hbvax2dt hbvax3dt hbvaxtype hbviudt hbviur hbvqualdt hbvqualr hcvgen hcvqualdt hcvqualr hcvribadt hcvribar
-	 hosp hospnites igmhavdt igmhavr igmhbcdt igmhbcr notvaxreas pvst pvstr sxs sxsspfy symptomatic tstreas tstreasspfy vaxcomment;
-run;
-
-
-
-/** Get CalREDIE data **/
-data calredie;
-set template (in = a)
-	calredie.calrediecumul;
-if a then delete;
-run;
-
-/** Get PHPP data **/
-
-data phpp;
-set template (in = a)
-	newphpp.phppcumul;
-if a then delete;
-keep ADDR Age AptNo CMRNumber CTract CellPhone CensusBlock City ClusterID CntyFIPS CntyGEO CntyOfResid Country CountryBirth DAT DDX DEP DIS DOB DON DTH
-     Disease DiseaseGrp DtAdmit DtArrival DtClosed DtCreate DtDischarge DtLabCollect DtLabRpt DtRptBy DtSent DtSubmit EDD Ethnicity Exposure FDAR FDDX 
-	 FDOB FDON FDTH FNA FinalDispo HomePhone Hospital ID IStatus InPatient IncidentID IndexCase Investigator LHD LHJNumber LNA Laboratory Language
-     Latitude Longitude MNA MRN NOC NameSuffix OCC OccLocation OccSettingSpec OccSettingType OccSpecify Occupation OtherDisease OutPatient OutbreakNum
-     OutbreakType PStatus Pregnant PtDiedIllness PtHospitalized RE RPTBy RSAddress RSCity  RSClass RSLocType RSLocation RSName RSPhone RSState RSZipCode
-     RStatus Race Region Report SOURCE SSN Sex State Submitter Symptomatic TStatus WorkPhone XCTR XCTRY XDAR XOCC XOUT XRTYP XTYP YEAR Zip ctyear fname_points
-     lname_points nickname pdfl pdup xtd alt altdt antihbsr antihavdt antihavr antihbcdt antihbcr antihbsdt antihcvdt antihcvr antihcvrat antihcvtrupos
-	 antihdvdt antihdvr antihevdt antihevr ast astdt bili bilidt died er havax havax1 havax2 havax1dt havax2dt havaxtype hbeagdt hbeagr hbsagdt hbsagr
- 	 hbvax hbvax1 hbvax2 hbvax3 hbvax1dt hbvax2dt hbvax3dt hbvaxtype hbviudt hbviur hbvqualdt hbvqualr hcvgen hcvqualdt hcvqualr hcvribadt hcvribar
-	 hosp hospnites igmhavdt igmhavr igmhbcdt igmhbcr notvaxreas pvst pvstr sxs sxsspfy symptomatic tstreas tstreasspfy vaxcomment;
-run;
-
-/** Merge all **/
-
-data newmorb;
-set calredie
-	noncalredie
-	phpp
-	cmrs;
+informat address $80.
+	   city $45.
+	   death $10.
+	   dis $21.
+	   ethnicity $23.
+	   first_name $21.
+	   lhj $14.
+	   last_name $25.
+	   occupation_setting $43.
+	   onset $10.
+	   race $41.
+	   report $8.
+	   sex $26.
+	   state $8.;
+format address $80.
+	   city $45.
+	   death $10.
+	   dep MMDDYY10.
+	   dis $21.
+	   don MMDDYY10.
+	   dth MMDDYY10.
+	   ethnicity $23.
+	   first_name $21.
+	   lhj $14.
+	   last_name $25.
+	   occupation_setting $43.
+	   onset $10.
+	   race $41.
+	   report $8.
+	   sex $26.
+	   state $8.;
+set cmrs;
+don = input(onset, MMDDYY10.);
+dth = input(death, MMDDYY10.);
+dis = 'HEP-B-CR';
+dep = min(received, submitted, diagnosis, onset);
+age = int((dep - dob)/365);
+if zip ^= . then zip_temp = put(zip, 12.);
+if ssn ^= . then ssn_temp = put(ssn, 14.);
+if phone ^= . then homephone = put(phone, 31.); 
+if sex = 'MALE' then sex = 'M';
 if sex = 'FEMALE' then sex = 'F';
-LHD = upcase(LHD);
-if LHD = 'BERKELEY CITY' then LHD = 'BERKELEY';
-if LHD = 'PASADENA CITY' then LHD = 'PASADENA';
-if LHD = 'LONG BEACH CITY' then LHD = 'LONG BEACH';
-race = upcase(race);
 if prxmatch("m/american indian|native american/oi", race) > 0 then race= 'American Indian/Alaska Native';
 if prxmatch("m/bangladesh/oi", race) > 0 then race= 'Asian - Bangladeshi';
 if prxmatch("m/cambodia/oi", race) > 0 then race= 'Asian - Cambodian';
@@ -302,23 +272,20 @@ if prxmatch("m/yape/oi", race) > 0 then race= 'Pacific Islander - Yapese';
 if race in ('UNKNOWN', 'UNK') then race = 'Unknown';
 if race in ('WHITE') then race = 'White';
 if race in ('API', 'ASIAN/PACIFIC ISLANDER', 'OTHER ASIAN/PAC ISL', 'ASIAN/PAC ISL', 'ASIAN/PACIFIC ISLANDER OTHER') then race = 'Asian/Pacific Islander';
-if prxmatch("m/mexican/oi", race) > 0 then race= 'White';
-if report in ('PHPP', 'CMRS') or (report in ('Morb', 'CalREDIE') and dtcreate > mdy(12,31,2011) and dtcreate < mdy(10,1,2013));
+if ethnicity in ('HISPANIC/LATINO', 'Hispanic/Latino', 'hispanic/latino') then ethnicity = 'Hispanic/Latino';
+if ethnicity in ('NON-HISPANIC/NON-LATINO', 'Non-Hispanic/Non-Latino', 'non-hispanic/non-latino') then ethnicity = 'Non-Hispanic/Non-Latino';
+report = 'CMRS';
+drop ssn zip onset phone death f20;
+rename address = addr diagnosis = ddx received = dat first_name = fna last_name = lna lhj = lhd occupation_setting = occsettingtype ssn_temp = ssn zip_temp = zip;
 run;
 
-data hcvdest.hepc11222013;
-set newmorb;
-if dis in ('HEP-C', 'HEP-C-CR');
-run;
-
-data hbvdest.hepb11222013;
-set newmorb;
-if dis in ('HEP-B', 'HEP-B-CR');
+data cmrs;
+set template (in = a)
+    cmrs;
+if a then delete;
 run;
 
 
-data morb.morb2012;
-set hbvdest.hepb11222013
-    oldmorb (in = a);
-if a = 1 and dat > mdy(12,31,2011) then delete;
+data cmrs.cmrs;
+set cmrs;
 run;

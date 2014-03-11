@@ -1,7 +1,7 @@
 *=====================================================================;
 * Analyst : 		Adam Coutts
 * Created : 		March 14, 2011
-* Last Updated : 	December 3, 2013 by Darryl Kong (change directories to allow a trial
+* Last Updated : 	Feb 13, 2014 by Darryl Kong (Save datafiles back to main folder)
 * Purpose : 		Assign libnames and generate user-defined formats
 *=====================================================================;
 
@@ -19,7 +19,7 @@
 
 * Assign shorthand library name for various data locations;
 * Must run %let statement at beginning of 00 Runfile.sas program for the macro variable "directory" to work;
-libname mainfldr "&directory.\Datasets\Trial";
+libname mainfldr "&directory.\Datasets";
 libname nick "&directory.\Nicknames";
 libname archive "&directory.\Datasets\Archived Data";
 

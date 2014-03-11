@@ -1,7 +1,7 @@
 *=====================================================================;
 * Analyst : Adam Coutts
 * Created : June 14, 2011
-* Las Updated: May 10, 2012 by Alexia Exarchos
+* Las Updated: Mar 5, 2014 by Darryl Kong
 * Purpose : THIS PROGRAM SHOULD ONLY BE RUN IF OTHER PROGRAMS RUN
 			SUCCESSFULLY AND ERROR-FREE
 			It breaks final, best-choice-demographic dataset (setx15 
@@ -23,8 +23,8 @@ run;
 	main02 (leaf, multiple records per person, episode level, higher numbers);
 **DK CHANGE (ADD BEST AND CITY VARIABLES);
 
-data main01 (keep = link_id best_first_name best_last_name best_middle_name best_ssn best_sex best_race_ethnicity best_date_of_birth country birthcountry patient_ID data_source
-		best_date_of_death prison_ever prison_firstrpt records_per firstdate dxdate main_diagnosis overall_diagnosis first_lhj common_lhj first_city common_city age agedx firstyear dxyear)
+data main01 (keep = link_id best_first_name best_last_name best_middle_name best_ssn best_sex best_race_ethnicity best_date_of_birth country 
+		best_date_of_death prison_ever prison_firstrpt records_per firstdate dxdate first_lhj common_lhj first_city common_city age agedx firstyear dxyear)
 	 main02 (keep = link_id id occupation date_of_onset date_of_diagnosis mmwr_year patient_address
 	    first_name last_name middle_name ssn sex race_ethnicity date_of_birth date_of_death
 		patient_city patient_zip_code census_tract account_name account_address account_city account_zip_code
