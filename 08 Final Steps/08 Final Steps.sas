@@ -23,13 +23,13 @@ run;
 	main02 (leaf, multiple records per person, episode level, higher numbers);
 **DK CHANGE (ADD BEST AND CITY VARIABLES);
 
-data main01 (keep = link_id best_first_name best_last_name best_middle_name best_ssn best_sex best_race_ethnicity best_date_of_birth country 
-		best_date_of_death prison_ever prison_firstrpt records_per firstdate dxdate first_lhj common_lhj first_city common_city age agedx firstyear dxyear)
+data main01 (keep = link_id best_first_name best_last_name best_middle_name best_ssn best_sex best_race_ethnicity best_date_of_birth country acute chronic
+		best_date_of_death prison_ever prison_firstrpt records_per firstdate firstdate_ch firstdate_ac dxdate dxdate_ch first_lhj common_lhj first_city common_city age agedx firstyear dxyear)
 	 main02 (keep = link_id id occupation date_of_onset date_of_diagnosis mmwr_year patient_address
 	    first_name last_name middle_name ssn sex race_ethnicity date_of_birth date_of_death
 		patient_city patient_zip_code census_tract account_name account_address account_city account_zip_code
 		local_health_juris laboratory diagnosis ordering_doctor episode_date_1 episode_date_2 episode_date_3
-		episode_date_4 collection_date result_date firstdate reporter_type prison patient_id data_source result_comment 
+		episode_date_4 collection_date result_date dis firstdate reporter_type prison patient_id data_source result_comment 
 		result_name result_value test_name order_name diagnosis2);
 
 	*main01_ForFutureDedup (keep=link_id id first_name last_name middle_name ssn sex race_ethnicity date_of_birth prison_firstrpt first_lhj) 
@@ -54,8 +54,13 @@ data template01;
 	attrib best_race_ethnicity length = $35. format = $35. informat = $35.;
 	attrib best_date_of_birth length = 8. format = MMDDYY10. informat = MMDDYY10.;
 	attrib best_date_of_death length = 8. format = MMDDYY10. informat = MMDDYY10.;
+	attrib chronic length = 8. format = 8. informat = 8.;
+	attrib acute length = 8. format = 8. informat = 8.;
 	attrib firstdate length = 8. format = MMDDYY10. informat = MMDDYY10.;
+	attrib firstdate_ch length = 8. format = MMDDYY10. informat = MMDDYY10.;
+    attrib firstdate_ac length = 8. format = MMDDYY10. informat = MMDDYY10.;
 	attrib dxdate length = 8. format = MMDDYY10. informat = MMDDYY10.;
+	attrib dxdate_ch length = 8. format = MMDDYY10. informat = MMDDYY10.;
 	attrib prison_ever length = $1. format = $1. informat = $1.;
 	attrib prison_firstrpt length = $1. format = $1. informat = $1.;
 	attrib main_diagnosis length = 8. format = 1. informat = 1.;
@@ -73,8 +78,10 @@ data main01;
 	race_ethnicity=strip(race_ethnicity);
 	run;
 
+
 data template02;
 	attrib link_id length = 8. format = 8. informat = 8.;
+	attrib dis length = $21. format = $21. informat = $21.;
 	attrib first_name length = $20. format = $20. informat = $20.;
 	attrib last_name length = $35. format = $35. informat = $35.;
 	attrib middle_name length = $20. format = $20. informat = $20.;
@@ -143,5 +150,3 @@ proc sort data=duplink1 nodupkey; by link_id; run;
 data mainfldr.main01_ChronicHBV;
 set main01;
 run;
-
-

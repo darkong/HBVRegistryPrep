@@ -155,7 +155,7 @@ if (notdigit(zip) > 5 | notdigit(strip(zip)) = 0) then
 	patient_zip_code = put (substr(zip,1,5),8.);
 
 * Select CHRONIC HBV cases;
-if dis = 'HEP-B-CR';
+if dis = 'HEP-B-CR' or (dis = 'HEP-B' and Rstatus = 'Confirmed');
 
 * Drop unnneeded variables;
 drop ADDR age aptno ctract cellphone CENSUSBLOCK CITY CLUSTERID CMRNUMBER CntyOfResid dat

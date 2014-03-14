@@ -230,6 +230,7 @@ proc sort data=setx14;
 by patient_city;
 run;
 
+
 data ptcity;
 merge setx14 (in=a) cacitylhj (rename=(city=patient_city));
 by patient_city;
@@ -548,7 +549,7 @@ data best_dod (keep = link_id date_of_death);
 	if percent > 70;
 	run;
 
-* Take date of first contact;
+* Take date of first contact - any;
 data date_set;
 	set setx14 (keep = link_id firstdate);
 	where firstdate ne .;
@@ -557,11 +558,46 @@ data date_set;
 * Sort, so that earliest date is first record for each person;
 proc sort data=date_set; by link_id firstdate; run;
 
-**DK CHANGE (alter algorithm);
-* Take first date of clinic visit/report/data transmission/etc;
 proc sort data=date_set nodupkey; by link_id; run;
 
-* Take date of first diagnosis;
+
+* Take date of first contact - chronic;
+data date_set_ch;
+	set setx14 (keep = link_id firstdate dis);
+	where firstdate ne . and dis ^= 'HEP-B';
+	drop dis;
+	run;
+
+* Sort, so that earliest date is first record for each person;
+proc sort data=date_set_ch; by link_id firstdate; run;
+
+proc sort data=date_set_ch nodupkey; by link_id; run;
+
+data chronics;
+set date_set_ch;
+chronic = 1;
+drop firstdate;
+run;
+
+* Take date of first contact - acute;
+data date_set_ac;
+	set setx14 (keep = link_id firstdate dis);
+	where firstdate ne . and dis = 'HEP-B';
+	drop dis;
+	run;
+
+* Sort, so that earliest date is first record for each person;
+proc sort data=date_set_ac; by link_id firstdate; run;
+
+proc sort data=date_set_ac nodupkey; by link_id; run;
+
+data acutes;
+set date_set_ac;
+acute = 1;
+drop firstdate;
+run;
+
+* Take date of first diagnosis - any;
 data dxdate_set;
 	set setx14 (keep = link_id dxdate);
 	where dxdate ne .;
@@ -571,6 +607,19 @@ data dxdate_set;
 proc sort data=dxdate_set; by link_id dxdate; run;
 * Take first diagnosis date;
 proc sort data=dxdate_set nodupkey; by link_id; run;
+
+
+* Take date of first diagnosis - chronic;
+data dxdate_set_ch;
+	set setx14 (keep = link_id dxdate dis);
+	where dxdate ne . and dis ^= 'HEP-B';
+	drop dis;
+	run;
+
+* Sort, so that earliest date is first record for each person;
+proc sort data=dxdate_set_ch; by link_id dxdate; run;
+* Take first diagnosis date;
+proc sort data=dxdate_set_ch nodupkey; by link_id; run;
 
 
 * Take local health jurisdiction at time of first contact;
@@ -583,6 +632,7 @@ data lhj_set;
 proc sort data=lhj_set; by link_id firstdate; run;
 * Delete all other dates per person, only take first date and link_id;
 proc sort data=lhj_set (keep = link_id first_lhj) nodupkey; by link_id; run;
+
 
 * Compute most common LHJ;
 * First, create frequencies;
@@ -874,13 +924,20 @@ proc sort data=best_dob; by link_id; run;
 proc sort data=best_dod; by link_id; run;
 proc sort data=transg nodupkey; by link_id; run;
 proc sort data=num_link_id (keep = link_id count rename = (count = records_per)); by link_id; run;
-* First prison data sort so that S (state prison history) is over O (other prison/jail history), and 
-	so O is over blanks;
+proc sort data=chronics; by link_id; run;
+proc sort data=acutes; by link_id; run;
+proc sort data=date_set; by link_id; run;
+proc sort data=date_set_ac; by link_id; run;
+proc sort data=date_set_ch; by link_id; run;
+proc sort data=dxdate_set; by link_id; run;
+proc sort data=dxdate_set_ch; by link_id; run;
 proc sort data=best_lhj; by link_id; run;
 proc sort data = lhj_set; by link_id; run;
 proc sort data = city_set; by link_id; run;
 proc sort data = best_city; by link_id; run;
 proc sort data=prison_ever; by link_id descending prison_ever; run;
+* First prison data sort so that S (state prison history) is over O (other prison/jail history), and 
+	so O is over blanks;
 proc sort data=prison_firstrpt; by link_id; run;
 * Then delete so as to only take the highest ranking record;
 proc sort data=prison_ever nodupkey; by link_id; run;
@@ -900,8 +957,13 @@ data setx15;
 		prison_ever
 		prison_firstrpt
 		transg (in = trans)
-		date_set
-		dxdate_set
+		acutes
+		chronics
+	    date_set
+	    date_set_ch (rename = (firstdate = firstdate_ch))
+		date_set_ac (rename = (firstdate = firstdate_ac))
+	    dxdate_set
+	    dxdate_set_ch (rename = (dxdate = dxdate_ch))
 		lhj_set
 		best_lhj (rename = (local_health_juris = common_lhj))
 		city_set
