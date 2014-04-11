@@ -306,10 +306,6 @@ if prxmatch("m/mexican/oi", race) > 0 then race= 'White';
 if report in ('PHPP', 'CMRS') or (report in ('Morb', 'CalREDIE') and dtcreate > mdy(12,31,2011) and dtcreate < mdy(10,1,2013));
 run;
 
-data hcvdest.hepc11222013;
-set newmorb;
-if dis in ('HEP-C', 'HEP-C-CR');
-run;
 
 data hbvdest.hepb11222013;
 set newmorb;
