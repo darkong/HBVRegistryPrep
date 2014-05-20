@@ -75,7 +75,7 @@ data template01;
 data main01;
 	set template01 (in = a) main01;
 	if a then delete;
-	race_ethnicity=strip(race_ethnicity);
+	best_race_ethnicity=strip(best_race_ethnicity);
 	run;
 
 
@@ -150,3 +150,4 @@ proc sort data=duplink1 nodupkey; by link_id; run;
 data mainfldr.main01_ChronicHBV;
 set main01;
 run;
+

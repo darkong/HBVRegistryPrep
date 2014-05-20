@@ -76,6 +76,8 @@ data lnamedel (rename = (lnamedel = id));
 * This data step links together all records that are transitively related to each other
   	For an explanation as to the mechanism, see Glenn Wrights's paper, "Transitive Record 
 	Linkage in SAS using Hash Objects", WUSS San Diego 2011;
+* To ensure that link_id is assigned to the lowest id among a group of linked records, sort by id
+	and apply the first id value to the link_id value (setx13a);
 
 data setx12a;
 	set setx12 (keep = id1 id2);
@@ -137,9 +139,28 @@ set setx12a;
 	buffer.clear();  
 	run;
 
+proc sort data = setx13; by link_id old_id; run;
+
+data setx13a;
+set setx13;
+by link_id old_id;
+if first.link_id;
+rename old_id = link_id2;
+run;
+
+proc sort data = setx13; by link_id; run;
+proc sort data = setx13a; by link_id; run;
+
+data setx13;
+merge setx13
+      setx13a;
+by link_id;
+drop link_id;
+run;
+
 
 * Sort linked up dataset, main dataset, and first/last name deletion datasets for merging;
-proc sort data=setx13 (rename = (old_id = id)) nodup; by id; run;
+proc sort data=setx13 (rename = (old_id = id link_id2 = link_id)) nodup; by id; run;
 proc sort data=set101; by id; run;
 proc sort data=fnamedel; by id; run;
 proc sort data=lnamedel; by id; run;
@@ -188,6 +209,7 @@ data setx14;
 
 	if reversal then reversal_flag = 1;
 run;
+
 
 **DK CHANGE (calculate city variables);
 * clean up LHJ variable, if possible;
