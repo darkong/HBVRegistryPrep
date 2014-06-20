@@ -47,7 +47,7 @@ end;
 else if (date > mdy(12,29,year(&date))) and (weekday(&date) < 3) then do;
       weeknum = 1;
 end; 
-else if (date > mdy(12,28,year(&date))) and (weekday(&date) < 2) then do;;
+else if (date > mdy(12,28,year(&date))) and (weekday(&date) < 2) then do;
       weeknum = 1;
 end; 
 else do;
